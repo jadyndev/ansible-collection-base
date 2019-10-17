@@ -1,0 +1,16 @@
+- name: "create user {{ user.name }}"
+  user:
+    name: "{{ user.name }}"
+    shell: "/bin/bash"
+    groups: []
+  become: yes
+
+- name: "add ssh key for {{ user.name }}"
+  authorized_key:
+    user: "{{ user.name }}"
+    key: "{{ key.key }}"
+    state: "{{ 'present' if key.active else 'absent' }}"
+  become: yes
+  loop: "{{ user.ssh }}"
+  loop_control:
+    loop_var: key

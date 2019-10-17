@@ -1,0 +1,3 @@
+---
+users_sudo_namespace: ansible-managed
+users: []
