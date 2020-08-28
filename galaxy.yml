@@ -1,0 +1,11 @@
+namespace: famedly
+name: base
+version: 0.1.0
+readme: README.md
+authors:
+- Vincent Wilke <vincent@wilkeimnetz.de>
+description: basic functionality needed on many hosts
+license:
+- AGPL-3.0-only
+build_ignore:
+- '*.tar.gz'
