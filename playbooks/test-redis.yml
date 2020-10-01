@@ -1,0 +1,9 @@
+- hosts: [ localhost ]
+  become: yes
+  collections:
+    - famedly.base
+  roles:
+    - role: redis
+  vars:
+    redis_secret: s3cr3t
+    redis_prefix: test_

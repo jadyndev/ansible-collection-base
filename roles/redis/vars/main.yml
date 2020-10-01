@@ -1,0 +1,6 @@
+---
+
+redis_docker_labels_base:
+  version: "{{ redis_version }}"
+redis_docker_labels_complete: "{{ redis_docker_labels_base | combine(redis_docker_labels) }}"
+

@@ -1,0 +1,50 @@
+---
+
+- name: Create redis user
+  user:
+    name: "{{ redis_user }}"
+    create_home: no
+    state: present
+  register: redis_user_res
+
+- name: Create redis directory
+  file:
+    path: "{{ redis_basepath }}"
+    state: directory
+    owner: "{{ redis_user }}"
+    group: "{{ redis_user }}"
+
+- name: Create redis directory for data persistance
+  file:
+    path: "{{ redis_data_dir }}"
+    state: directory
+    owner: "{{ redis_user }}"
+    group: "{{ redis_user }}"
+
+- name: Create redis config directory
+  file:
+    path: "{{ redis_config_dir }}"
+    state: directory
+    owner: "{{ redis_user }}"
+    group: "{{ redis_user }}"
+
+- name: Template redis config file
+  template:
+    src: redis.conf.j2
+    dest: "{{ redis_config_file }}"
+    owner: "{{ redis_user }}"
+    group: "{{ redis_user }}"
+
+- name: Setup redis docker container
+  docker_container:
+    image: "{{ redis_docker_image }}"
+    name: "{{ redis_docker_container_name }}"
+    restart_policy: unless-stopped
+    recreate: true
+    pull: true
+    user: "{{ redis_user_res.uid }}:{{ redis_user_res.group }}"
+    ports: "{{ redis_docker_ports }}"
+    volumes: "{{ redis_docker_volumes }}"
+    labels: "{{ redis_docker_labels_complete }}"
+    entrypoint: "redis-server"
+    command: [ "{{ redis_docker_configpath }}" ]
