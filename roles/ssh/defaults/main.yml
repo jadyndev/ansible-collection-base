@@ -1,0 +1,32 @@
+---
+
+ssh_config_file: "/etc/ssh/sshd_config"
+
+ssh_allowed_kexalgos:
+  - ecdh-sha2-nistp521
+  - ecdh-sha2-nistp384
+  - ecdh-sha2-nistp256
+  - diffie-hellman-group-exchange-sha256
+  - diffie-hellman-group16-sha512
+
+# Prefer the "encrypt-then-MAC" (etm) ciphers
+ssh_allowed_ciphers:
+  - aes256-gcm@openssh.com
+  - aes128-gcm@openssh.com
+  - aes256-ctr
+  - aes192-ctr
+  - aes128-ctr
+
+ssh_allowed_macs:
+  - hmac-sha2-512-etm@openssh.com
+  - hmac-sha2-256-etm@openssh.com
+  - hmac-sha2-512
+  - hmac-sha2-256
+
+ssh_allowed_hostkey_algos:
+  - ecdsa-sha2-*
+
+# Disallow ssh-dss
+ssh_allowed_pubkey_algos:
+  - "-ssh-dss"
+
