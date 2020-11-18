@@ -74,7 +74,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: '^#?KexAlgorithms'
-    line: "KexAlgorithms {{ ssh_allowed_kexalgos|join(',') }}"
+    line: "KexAlgorithms {{ ssh_preset.allowed_kexalgos|join(',') }}"
     insertafter: *cipher_after
   notify: reload sshd
 
@@ -82,7 +82,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: '^#?Ciphers'
-    line: "Ciphers {{ ssh_allowed_ciphers|join(',') }}"
+    line: "Ciphers {{ ssh_preset.allowed_ciphers|join(',') }}"
     insertafter: *cipher_after
   notify: reload sshd
 
@@ -90,7 +90,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: '^#?MACs'
-    line: "MACs {{ ssh_allowed_macs|join(',') }}"
+    line: "MACs {{ ssh_preset.allowed_macs|join(',') }}"
     insertafter: *cipher_after 
   notify: reload sshd
 
@@ -98,7 +98,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: '^#?HostKeyAlgorithms'
-    line: "HostKeyAlgorithms {{ ssh_allowed_hostkey_algos|join(',') }}"
+    line: "HostKeyAlgorithms {{ ssh_preset.allowed_hostkey_algos|join(',') }}"
     insertafter: *cipher_after
   notify: reload sshd
 
@@ -106,8 +106,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: '^#?PubkeyAcceptedKeyTypes'
-    line: "PubkeyAcceptedKeyTypes {{ ssh_allowed_pubkey_algos|join(',') }}"
+    line: "PubkeyAcceptedKeyTypes {{ ssh_preset.allowed_pubkey_algos|join(',') }}"
     insertafter: *cipher_after
   notify: reload sshd
-
 
