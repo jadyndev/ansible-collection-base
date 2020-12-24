@@ -1,0 +1,71 @@
+---
+
+- name: Set SSHFP records
+  cloudflare_dns:
+    type: SSHFP
+    zone: "{{ item[0] }}"
+    record: "{{ dns_host_name_short }}"
+    value: "{{ item[1].fingerprint }}"
+    algorithm: "{{ dns_sshfp_algorithm[ item[1].algorithm ] }}"
+    hash_type: "{{ dns_sshfp_type[ item[1].hash_type ] }}"
+    api_token: "{{ dns_cloudflare_api_key }}"
+  loop: "{{ dns_zones | product(dns_host_sshfp) | list }}"
+  when: dns_management_method == "cloudflare" and dns_host_sshfp is defined
+
+- name: Set A records
+  cloudflare_dns:
+    type: A
+    zone: "{{ item[0] }}"
+    record: "{{ item[1].name }}"
+    value: "{{ item[1].target.ipv4 | default(dns_host_ipv4) }}"
+    api_token: "{{ dns_cloudflare_api_key }}"
+  loop: "{{ dns_zones | product(dns_all_hostnames) | list }}"
+  when: >
+    dns_management_method == "cloudflare"
+    and ((
+      item[1].target is defined
+        and item[1].target.ipv4 is defined)
+      or dns_host_ipv4 is defined)
+    and (item[1].only is undefined or item[1].only == item[0])
+
+- name: Set AAAA records
+  cloudflare_dns:
+    type: AAAA
+    zone: "{{ item[0] }}"
+    record: "{{ item[1].name }}"
+    value: "{{ item[1].target.ipv6 | default(dns_host_ipv6) }}"
+    api_token: "{{ dns_cloudflare_api_key }}"
+  loop: "{{ dns_zones | product(dns_all_hostnames) | list }}"
+  when: >
+    dns_management_method == "cloudflare"
+    and ((
+      item[1].target is defined
+        and item[1].target.ipv6 is defined)
+      or dns_host_ipv6 is defined)
+    and (item[1].only is undefined or item[1].only == item[0])
+
+- name: Set CNAME records
+  cloudflare_dns:
+    type: CNAME
+    zone: "{{ item.0.zone }}"
+    record: "{{ item.1.name }}"
+    value: "{{ item.1.target|default(dns_host_name_short) }}.{{ item.0.zone }}"
+    api_token: "{{ dns_cloudflare_api_key }}"
+  loop: "{{ dns_cnames | subelements('names') }}"
+  when: dns_management_method ==  "cloudflare"
+
+- name: Set SRV records
+  cloudflare_dns:
+    type: SRV
+    zone: "{{ item.0.zone }}"
+    record: "{{ item.1.record|default(dns_host_name_short) }}"
+    value: "{{ item.1.target|default([ dns_host_name_short, item.0.zone ]|join('.')) }}"
+    service: "{{ item.1.name }}"
+    proto: "{{ item.1.protocol|default('tcp') }}"
+    port: "{{ item.1.port }}"
+    priority: "{{ item.1.priority|default(10) }}"
+    weight: "{{ item.1.weight|default(10) }}"
+    api_token: "{{ dns_cloudflare_api_key }}"
+  loop: "{{ dns_services | subelements('services') }}"
+  when: dns_management_method ==  "cloudflare"
+
