@@ -1,0 +1,27 @@
+---
+
+- name: Set /etc/hostname to FQDN of the server
+  copy:
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      {{ hostname_fqdn }}
+
+- name: Ensure /etc/hosts contains all hostnames and aliases of the server
+  blockinfile:
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      {% for host in hostname_hosts %}
+      {{ host.ip }}	{{ host.fqdn }}		{{ host.alias | default([]) | join(" ") }}
+      {% endfor %}
+    marker: "# {MARK} ANSIBLE MANAGED BLOCK"
+
+- name: Set hostname via hostnamectl to avoid a reboot
+  command:
+    cmd: "hostnamectl set-hostname {{ hostname_fqdn }}"
+
