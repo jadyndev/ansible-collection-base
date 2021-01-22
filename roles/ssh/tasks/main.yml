@@ -46,7 +46,7 @@
     <<: *sshd_config_args
     regexp: "^#?Protocol"
     line: "Protocol 2"
-    insertafter: &cipher_after "^# Ciphers and keying" 
+    insertafter: &cipher_after "^# Ciphers and keying"
   notify: reload sshd
 
 - name: Disallow X11-Forwarding
@@ -91,7 +91,7 @@
     <<: *sshd_config_args
     regexp: '^#?MACs'
     line: "MACs {{ ssh_preset.allowed_macs|join(',') }}"
-    insertafter: *cipher_after 
+    insertafter: *cipher_after
   notify: reload sshd
 
 - name: Only allow reasonably secure hostkey algorithms
