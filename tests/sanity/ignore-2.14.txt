@@ -1,1 +1,2 @@
+plugins/modules/gpg_secretstore.py validate-modules:missing-gplv3-license # ignore license check
 roles/lego/templates/metrics-textfile.py.j2 shebang
