@@ -7,16 +7,20 @@
   until: "task_result is success"
   retries: 3
   delay: 2
+  tags: ['prepare', 'prepare-users']
 
 - name: "Query groups available on server"
   ansible.builtin.getent:
     database: "group"
+  tags: ['configure', 'configure-users']
 
 - name: "Loop over users and include per-user tasks"
   include_tasks: "user.yml"
   loop: "{{ users | dict2items(key_name='name', value_name='attrs') }}"
   loop_control:
     loop_var: "user"
+    label: "{{ user.name }}"
+  tags: ['configure', 'configure-users']
 
 - name: "Template sudoers.d managed file"
   template:
@@ -26,3 +30,4 @@
     mode: "0440"
     validate: "/usr/sbin/visudo -cf %s"
   become: true
+  tags: ['configure', 'configure-users']
