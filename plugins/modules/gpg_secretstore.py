@@ -299,6 +299,7 @@ def main():
     data_type = module.params["data_type"]
     overwrite = module.params["overwrite"]
     recrypt = module.params["recrypt"]
+    secret_type = module.params["secret_type"]
 
     if overwrite or recrypt:
         try:
@@ -314,7 +315,15 @@ def main():
         except (PasswordDecodeError, FileNotFoundError):
             result["action"] = "add"
         try:
-            store.put(slug=password_slug, data=secretGenerator.getSecret())
+            if secretGenerator.secret_type == "binary":
+                save_as_data_type = "plain"
+            else:
+                save_as_data_type = data_type
+            store.put(
+                slug=password_slug,
+                data=secretGenerator.getSecret(),
+                data_type=save_as_data_type,
+            )
         except (FileNotFoundError, PasswordStoreException):
             failed = True
             result[
@@ -331,7 +340,15 @@ def main():
             logging.v("No secret found, new secret will be generated")
             result["secret"] = secretGenerator.getSecret()
             try:
-                store.put(slug=password_slug, data=secretGenerator.getSecret())
+                if secretGenerator.secret_type == "binary":
+                    save_as_data_type = "plain"
+                else:
+                    save_as_data_type = data_type
+                store.put(
+                    slug=password_slug,
+                    data=secretGenerator.getSecret(),
+                    data_type=save_as_data_type,
+                )
             except (FileNotFoundError, PasswordStoreException):
                 failed = True
                 result[
