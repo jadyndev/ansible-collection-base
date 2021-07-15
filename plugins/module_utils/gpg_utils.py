@@ -94,7 +94,7 @@ class SecretStore:
         except FileNotFoundError:
             raise FileNotFoundError
 
-    def __save(self, slug: str, data: str, recipients: list[str]) -> bool:
+    def __save(self, slug: str, data: str, recipients) -> bool:
         file = Path(
             (self.password_store_path / (slug + self.file_extension))
             .expanduser()
@@ -127,7 +127,7 @@ class SecretStore:
         except (json.decoder.JSONDecodeError, yaml.YAMLError) as e:
             raise PasswordDecodeError
 
-    def __get_recipients_from_keyring(self) -> list[str]:
+    def __get_recipients_from_keyring(self):
         recipients = []
         for key in self.__gpg.list_keys():
             if key["trust"] in [
@@ -138,7 +138,7 @@ class SecretStore:
                 recipients.append(key["fingerprint"])
         return recipients
 
-    def __get_recipients_from_pass_file(self, password_slug: str) -> list[str]:
+    def __get_recipients_from_pass_file(self, password_slug: str):
         base_path = self.password_store_path.expanduser().absolute() / password_slug
         while base_path.as_posix() != "/":
             if os.path.isfile(base_path / self.pass_gpg_id_file):
@@ -157,7 +157,7 @@ class SecretStore:
         data: Union[str, dict, list],
         data_type: str = None,
         recipient_method: str = "pass_file",
-        recipients_list: list[str] = None,
+        recipients_list=None,
     ):
         if not isinstance(data, str) and data_type is None:
             data_type = "yaml"

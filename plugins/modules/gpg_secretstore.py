@@ -21,6 +21,7 @@ DOCUMENTATION = r"""
 module: gpg_secretstore
 author:
     - Jadyn Emma Jäger (@jadyndev)
+    - Lars Kaiser (@lrsksr)
 requirements:
     - PyYAML >= 6.0
     - python >= 3.7
