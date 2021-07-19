@@ -29,6 +29,7 @@
   command:
     cmd: "hostname"
   changed_when: false
+  check_mode: false
   register: current_hostname
   tags: [ 'deploy', 'deploy-hostname' ]
 
