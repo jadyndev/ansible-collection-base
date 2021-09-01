@@ -3,6 +3,7 @@
     name: "{{ user.name }}"
     shell: "/bin/bash"
     groups: []
+    comment: "{{ user.gecos | default(omit) }}"
   become: yes
 
 - name: "add ssh key for {{ user.name }}"
