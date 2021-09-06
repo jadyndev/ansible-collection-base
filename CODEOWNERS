@@ -1,2 +1,7 @@
 * @jcgruenhage @Ratzupaltuff
+/roles/dns/ @transcaffeine
+/roles/hostname/ @transcaffeine
 /roles/ldap/ @jcgruenhage @transcaffeine
+/roles/redis/ @transcaffeine
+/roles/ssh/ @transcaffeine
+/roles/users/ @Ratzupaltuff @jadyn.dev
