@@ -1,4 +1,4 @@
-# Hostname management role
+# `famedly.base.hostname` ansible role for hostname management
 
 This role manages all hostnames of the target server,
 both `/etc/hostname` and additional hostnames in

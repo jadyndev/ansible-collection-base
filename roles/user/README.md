@@ -1,21 +1,23 @@
-User Provisioning
-============================
+# `famedly.base.user` ansible role
 
-This role is provisioning access of the staff to the servers this is run on
+This ansible role can be used to provision access to a server via SSH by
+creating and configuring users and their SSH keys and sudo privileges.
 
-Role Variables
---------------
+## Role Variables
 
-The defaults/main.yml file contains a list of users in this format:
-```
+The role takes a list of users to provision in the `users` variable in the following structure:
+
+```yaml
 users:
   - name: username
     root: true|false
-    gecos: Name
+    gecos: "Full Name"
     ssh:
-      - key: ssh key
+      - key: "ssh key"
         active: true|false
+      - [...]
+  - [...]
 ```
 
-Users is a list of users, ssh is a list of ssh keys.
-`gecos` is optinal
+The  [`gecos` field](https://en.wikipedia.org/wiki/Gecos_field) of a user is optional,
+and can be used to provide a full name for a user.

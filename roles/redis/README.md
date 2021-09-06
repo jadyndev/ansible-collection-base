@@ -1,4 +1,4 @@
-# Redis role
+# `famedly.base.redis` ansible role
 
 This role can be used to deploy redis in a docker container, and can be used
 as a easy drop-in when an application needs a redis DB for caching/...

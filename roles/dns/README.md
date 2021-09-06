@@ -1,4 +1,4 @@
-# DNS management role
+# `famedly.base.dns` ansible role for DNS management
 
 ## Currently supported
 

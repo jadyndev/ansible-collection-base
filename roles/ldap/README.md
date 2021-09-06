@@ -1,4 +1,4 @@
-# openLDAP role
+# `famedly.base.ldap` ansible role for openLDAP
 
 ## Description
 
