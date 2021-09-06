@@ -1,11 +1,16 @@
 namespace: famedly
 name: base
-version: 0.1.0
+version: 0.2.0
 readme: README.md
 authors:
-- Vincent Wilke <vincent@wilkeimnetz.de>
-description: basic functionality needed on many hosts
+- Jadyn Emma Jäger <jadyn@jadyn.dev>
+- Jan Christian Grünhage <jan.christian@gruenhage.xyz>
+- Johanna Dorothea Reichmann <transcaffeine@finallycoffee.eu>
+- Vincent Wilke <v.wilke@famedly.com>
+description: Common functionality needed on hosts to build complex services on.
 license:
 - AGPL-3.0-only
 build_ignore:
 - '*.tar.gz'
+repository: https://gitlab.com/famedly/company/devops/collections/base
+issues: https://gitlab.com/famedly/company/devops/collections/base/-/issues
