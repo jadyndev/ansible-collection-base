@@ -79,7 +79,7 @@ class SecretStore:
         self.gpg = self.__gpg
 
     def __load(self, slug: str) -> str:
-        file = (
+        file = Path(
             (self.password_store_path / (slug + self.file_extension))
             .expanduser()
             .absolute()
