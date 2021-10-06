@@ -4,6 +4,3 @@
 [submodule "roles/pip"]
 	path = roles/pip
 	url = https://github.com/geerlingguy/ansible-role-pip.git
-[submodule "roles/postgresql"]
-	path = roles/postgresql
-	url = https://github.com/geerlingguy/ansible-role-postgresql.git
