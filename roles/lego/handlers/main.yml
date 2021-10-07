@@ -2,7 +2,7 @@
 - name: Run lego
   become: yes
   become_user: "{{ lego_user_res.name }}"
-  environment: "{{ lego_configuration.environment }}"
+  environment: "{{ lego_configuration_merged.environment }}"
   command: "{{ lego_command_playbook }}"
 
 - name: Reload systemd

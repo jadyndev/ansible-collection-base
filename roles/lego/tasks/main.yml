@@ -1,9 +1,4 @@
 ---
-- name: debug
-  debug:
-    msg: "{{ lego_configuration_merged }}"
-
-
 - name: create lego user
   user:
     name: "{{ lego_user }}"

@@ -3,16 +3,41 @@ lego_challenge_mergeable:
   command_parameters:
     global: "{'{{ lego_challenge.type }}': '{{ lego_challenge.provider | default('') }}'}"
 
-lego_configuration_merged: "{{ lego_configuration_defaults | combine(lego_challenge_mergeable, recursive=True) | combine(lego_configuration | default({}), recursive=True) }}"
+lego_configuration_merged: >-
+  {{ lego_configuration_defaults | combine(lego_challenge_mergeable, recursive=True)
+  | combine(lego_configuration | default({}), recursive=True) }}
 
 # Build global command
-lego_command_domains: "{% for domain in lego_certificate.domains %}--domains={{ domain }} {% endfor %}"
-lego_command_parameters_global: "{% for parameter in lego_configuration_merged.command_parameters.global %}--{{ parameter }}{%if not (lego_configuration_merged.command_parameters.global[parameter] == None or lego_configuration_merged.command_parameters.global[parameter] == '') %}={{ lego_configuration_merged.command_parameters.global[parameter] }}{% endif %} {% endfor %}"
+lego_command_domains: >-2
+  {% for domain in lego_certificate.domains
+  %}--domains={{ domain }}
+  {% endfor %}
+
+lego_command_parameters_global: >-2
+  {% for parameter in lego_configuration_merged.command_parameters.global
+  %}--{{ parameter }}{%
+  if not (lego_configuration_merged.command_parameters.global[parameter] == None or lego_configuration_merged.command_parameters.global[parameter] == '')
+  %}={{ lego_configuration_merged.command_parameters.global[parameter] }}{%
+  endif %}
+  {% endfor %}
+
 lego_command_global_merged: "{{ lego_executable }} {{ lego_command_domains }}{{ lego_command_parameters_global }}"
 
 # Build action commands
-lego_command_playbook_parameters: "{% for parameter in lego_configuration_merged.command_parameters[lego_tasks.playbook] %}--{{ parameter }}{%if not (lego_configuration_merged.command_parameters[lego_tasks.playbook][parameter] == None or lego_configuration_merged.command_parameters[lego_tasks.playbook][parameter] == '') %}={{ lego_configuration_merged.command_parameters[lego_tasks.playbook][parameter] }}{% endif %} {% endfor %}"
+lego_command_playbook_parameters: >-2
+  {% for parameter in lego_configuration_merged.command_parameters[lego_tasks.playbook]
+  %}--{{ parameter }}{%
+  if not (lego_configuration_merged.command_parameters[lego_tasks.playbook][parameter] == None or lego_configuration_merged.command_parameters[lego_tasks.playbook][parameter] == '')
+  %}={{ lego_configuration_merged.command_parameters[lego_tasks.playbook][parameter] }}{%
+  endif %}
+  {% endfor %}
 lego_command_playbook: "{{ lego_command_global_merged }}{{ lego_tasks.playbook }} {{ lego_command_playbook_parameters }}"
 
-lego_command_systemd_parameters: "{% for parameter in lego_configuration_merged.command_parameters[lego_tasks.systemd] %}--{{ parameter }}{%if not (lego_configuration_merged.command_parameters[lego_tasks.systemd][parameter] == None or lego_configuration_merged.command_parameters[lego_tasks.systemd][parameter] == '') %}={{ lego_configuration_merged.command_parameters[lego_tasks.systemd][parameter] }}{% endif %} {% endfor %}"
+lego_command_systemd_parameters: >-2
+  {% for parameter in lego_configuration_merged.command_parameters[lego_tasks.systemd]
+  %}--{{ parameter }}{%
+  if not (lego_configuration_merged.command_parameters[lego_tasks.systemd][parameter] == None or lego_configuration_merged.command_parameters[lego_tasks.systemd][parameter] == '')
+  %}={{ lego_configuration_merged.command_parameters[lego_tasks.systemd][parameter] }}{%
+  endif %}
+  {% endfor %}
 lego_command_systemd: "{{ lego_command_global_merged }}{{ lego_tasks.systemd }} {{ lego_command_systemd_parameters }}"
