@@ -1,0 +1,10 @@
+---
+- name: Run lego
+  become: yes
+  become_user: "{{ lego_user_res.name }}"
+  environment: "{{ lego_configuration.environment }}"
+  command: "{{ lego_command_playbook }}"
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes

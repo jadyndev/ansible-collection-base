@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer for lego
+
+[Timer]
+OnBootSec={{ lego_timer_on_boot }}
+OnCalendar={{ lego_timer_on_calendar }}
+Unit=lego.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,89 @@
+---
+- name: debug
+  debug:
+    msg: "{{ lego_configuration_merged }}"
+
+
+- name: create lego user
+  user:
+    name: "{{ lego_user }}"
+    state: present
+    system: yes
+  register: lego_user_res
+
+- name: create directory for lego
+  file:
+    path: "{{ lego_base_path }}"
+    state: directory
+    owner: "{{ lego_user_res.uid }}"
+    group: "{{ lego_user_res.group }}"
+
+- name: Check if binary exsists and is the correct version
+  command:
+    cmd: "{{ lego_check_version_cmd }}"
+  ignore_errors: yes
+  register: lego_version_res
+
+- name: Install lego from github releases
+  block:
+    - name: Download source file
+      get_url:
+        url: "{{ lego_source_url }}"
+        dest: "{{ lego_base_path }}/source.tar"
+        checksum: "{{ lego_source_checksum_url }}"
+
+    - name: Unpack source files
+      unarchive:
+        src: "{{ lego_base_path }}/source.tar"
+        dest: "{{ lego_base_path }}"
+        owner: "{{ lego_user_res.uid }}"
+        group: "{{ lego_user_res.group }}"
+        remote_src: True
+
+    - name: Allow lego to bind to ports below 1024
+      capabilities:
+        path: "{{ lego_executable }}"
+        capability: cap_net_bind_service=+ep
+        state: present
+      when: lego_cap_net_bind_service
+
+    - name: Delete source files
+      file:
+        path: "{{ lego_base_path }}/source.tar"
+        state: absent
+  when: 'lego_version_res.failed or not lego_version in lego_version_res.stdout'
+
+- name: template systemd service
+  template:
+    src: lego.service.j2
+    dest: "{{ lego_systemd_path }}/lego.service"
+    owner: "root"
+    group: "root"
+    mode: '0755'
+  notify:
+    - Run lego
+    - Reload systemd
+
+- name: template systemd timer
+  template:
+    src: lego.timer.j2
+    dest: "{{ lego_systemd_path }}/lego.timer"
+    owner: "root"
+    group: "root"
+    mode: '0755'
+  notify:
+    - Reload systemd
+
+- name: Flush handlers for systemd
+  meta: flush_handlers
+
+- name: Enable lego.service
+  systemd:
+    name: "lego.service"
+    enabled: yes
+
+- name: Start and enable lego.timer
+  systemd:
+    name: "lego.timer"
+    state: started
+    enabled: yes

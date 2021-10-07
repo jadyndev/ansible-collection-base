@@ -1,0 +1,18 @@
+[Unit]
+Description=lego - Let's Encrypt client written in Go
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=lego
+
+[Service]
+{% for envvar in lego_configuration_merged.environment %}
+Environment={{ envvar }}={{ lego_configuration_merged.environment[envvar] }}
+{% endfor %}
+Type=oneshot
+Group={{ lego_user_res.group }}
+User={{ lego_user_res.name }}
+WorkingDirectory={{ lego_base_path }}
+ExecStart={{ lego_command_systemd }}
+
+[Install]
+WantedBy=multi-user.target
