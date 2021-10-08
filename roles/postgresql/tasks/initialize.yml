@@ -1,0 +1,51 @@
+---
+
+- name: Create directories for PostgreSQL
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ postgresql_user_res.uid }}"
+    group: "{{ postgresql_user_res.group }}"
+    mode: 0755
+  loop:
+    - "{{ postgresql_base_path }}"
+    - "{{ postgresql_data_path }}"
+    - "{{ postgresql_socket_path }}"
+    - "{{ postgresql_config_path }}"
+  tags: [ 'prepare', 'prepare-postgresql' ]
+
+- name: Template fake /etc/passwd for postgres
+  ansible.builtin.template:
+    src: postgresql-passwd.j2
+    dest: "{{ postgresql_config_path }}/postgresql-passwd"
+    owner: "{{ postgresql_user_res.uid }}"
+    group: "{{ postgresql_user_res.group }}"
+    mode: 0640
+  tags: [ 'prepare', 'prepare-postgresql' ]
+
+- name: Initialize PostgreSQL container
+  community.docker.docker_container:
+    name: "{{ postgresql_container_name }}"
+    image: "{{ postgresql_container_image }}"
+    ports: "{{ postgresql_container_ports }}"
+    volumes: "{{ postgresql_container_init_volumes }}"
+    labels: "{{ postgresql_container_labels_complete }}"
+    networks: "{{ postgresql_container_networks }}"
+    etc_hosts: "{{ postgresql_container_etc_hosts }}"
+    user: "{{ postgresql_user_res.uid }}:{{ postgresql_user_res.group }}"
+    state: started
+    env:
+      POSTGRES_PASSWORD: "{{ postgresql_superuser_password }}"
+  register: postgresql_container
+  tags: [ 'prepare', 'prepare-postgresql' ]
+
+- name: Wait for container to be initialized
+  wait_for:
+    path: "{{ postgresql_socket_path }}/.s.PGSQL.5432"
+  tags: [ 'prepare', 'prepare-postgresql' ]
+
+- name: Stop initialized container
+  community.docker.docker_container:
+    name: "{{ postgresql_container_name }}"
+    state: absent
+  tags: [ 'prepare', 'prepare-postgresql' ]
