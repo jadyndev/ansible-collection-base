@@ -5,6 +5,7 @@ lego_version: 4.5.2
 lego_system_type: "linux"
 lego_system_arch: "amd64"
 lego_executable: "{{ lego_base_path }}/lego"
+lego_account_base_path: "{{ lego_base_path }}/accounts"
 lego_cap_net_bind_service: yes
 
 lego_source_url: "https://github.com/go-acme/lego/releases/download/v{{ lego_version }}/lego_v{{ lego_version }}_{{ lego_system_type }}_{{ lego_system_arch }}.tar.gz"
@@ -30,6 +31,16 @@ lego_tasks:
   playbook: "run"
   systemd: "renew"
 
+lego_acme_account_defaults:
+  email: "{{ lego_certificate.email }}"
+  registration:
+    body:
+      status: "valid"
+      contact:
+        - "mailto:{{ lego_certificate.email }}"
+
+lego_certificate_renewal_days: 30
+
 lego_configuration_defaults:
   command_parameters:
     global:
@@ -39,5 +50,5 @@ lego_configuration_defaults:
       path: "{{ lego_base_path }}"
     run: {}
     renew:
-      days: 30
+      days: "{{ lego_certificate_renewal_days }}"
   environment: {}

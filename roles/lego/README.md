@@ -96,3 +96,21 @@ This role differentiates between 2 tasks:
 
 ### Hooks
 You can request lego to run hooks after certain events. You can add those using `lego_configuration`. More info on hooks can be found here: [https://go-acme.github.io/lego/usage/cli/examples/#to-renew-the-certificate-and-hook](https://go-acme.github.io/lego/usage/cli/examples/) 
+
+### Use an existing acme account
+To use an existing acme account you have to pass its account uri and the private key like this:
+
+**You MUST use a PEM-encoded private key:**
+It must be wrapped with `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----`.
+```yml
+lego_acme_privkey: |
+  -----BEGIN RSA PRIVATE KEY-----
+  MYSUPERSECRETPRIVATEKEY
+  MYSUPERSECRETPRIVATEKEY
+  MYSUPERSECRETPRIVATEKEY
+  -----END RSA PRIVATE KEY-----
+
+lego_acme_account:
+  registration:
+    uri: "https://acme-v02.api.letsencrypt.org/acme/acct/my-account-id"
+```

@@ -1,4 +1,8 @@
 ---
+- name: debug
+  debug:
+    msg: "{{ lego_command_playbook_parameters }}"
+
 - name: create lego user
   user:
     name: "{{ lego_user }}"
@@ -48,6 +52,41 @@
         state: absent
   when: 'lego_version_res.failed or not lego_version in lego_version_res.stdout'
 
+- name: Create acme account
+  block:
+    - name: Create account directory
+      file:
+        path: "{{ lego_acme_account_base_path }}"
+        state: directory
+        mode: "0700"
+        owner: "{{ lego_user_res.uid }}"
+        group: "{{ lego_user_res.group }}"
+
+    - name: Create key directory
+      file:
+        path: "{{ lego_acme_key_base_path }}"
+        state: directory
+        mode: "0700"
+        owner: "{{ lego_user_res.uid }}"
+        group: "{{ lego_user_res.group }}"
+
+    - name: Save acme account
+      copy:
+        dest: "{{ lego_acme_account_path }}"
+        content: "{{ lego_acme_account_merged | to_json }}"
+      notify:
+        - Run lego
+
+    - name: Save acme private key
+      copy:
+        dest: "{{ lego_acme_key_path }}"
+        content: "{{ lego_acme_privkey }}"
+      notify:
+        - Run lego
+
+  when: lego_acme_account is defined and lego_acme_privkey is defined
+
+
 - name: template systemd service
   template:
     src: lego.service.j2
@@ -69,7 +108,7 @@
   notify:
     - Reload systemd
 
-- name: Flush handlers for systemd
+- name: Flush handlers
   meta: flush_handlers
 
 - name: Enable lego.service
@@ -77,8 +116,14 @@
     name: "lego.service"
     enabled: yes
 
-- name: Start and enable lego.timer
+- name: Enable lego.timer
+  systemd:
+    name: "lego.timer"
+    enabled: yes
+  register: res_lego_timer
+
+- name: Start lego.timer
   systemd:
     name: "lego.timer"
     state: started
-    enabled: yes
+  when: res_lego_timer.changed
