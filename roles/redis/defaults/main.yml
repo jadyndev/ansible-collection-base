@@ -8,6 +8,9 @@ redis_config_dir: "{{ redis_basepath }}/{{redis_prefix }}config"
 redis_config_file: "{{ redis_config_dir }}/redis.conf"
 redis_secret: ~
 
+redis_config_bind_ip: "0.0.0.0"
+redis_config_unix_socket_path: ~
+redis_config_unix_socket_perm: 775
 # Overwrite per-instance to be able to run many instances on the same host
 # prefix should be sth like 'matrix_', modifies mapped directories, container name and uer
 redis_prefix: ""

@@ -66,7 +66,7 @@
 # IF YOU ARE SURE YOU WANT YOUR INSTANCE TO LISTEN TO ALL THE INTERFACES
 # JUST COMMENT THE FOLLOWING LINE.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bind 0.0.0.0
+bind {{ redis_config_bind_ip }}
 
 # Protected mode is a layer of security protection, in order to avoid that
 # Redis instances left open on the internet are accessed and exploited.
@@ -108,6 +108,10 @@ tcp-backlog 511
 #
 # unixsocket /tmp/redis.sock
 # unixsocketperm 700
+{% if redis_config_unix_socket_path and redis_config_unix_socket_perm %}
+unixsocket {{ redis_config_unix_socket_path }}
+unixsocketperm {{ redis_config_unix_socket_perm }}
+{% endif %}
 
 # Close the connection after a client is idle for N seconds (0 to disable)
 timeout 0
