@@ -1,5 +1,7 @@
 # `famedly.base` ansible collection
 
+![Matrix](https://img.shields.io/matrix/ansible-famedly:matrix.org)
+
 ## Scope
 
 This ansible collection contains a variety of basic/barebone functionality
