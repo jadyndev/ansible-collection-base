@@ -27,5 +27,4 @@ redis_docker_ports: [ "6379:6379" ]
 redis_docker_networks: ~
 redis_docker_purge_networks: false
 redis_docker_volumes:
-  - "{{ redis_data_dir }}:/data"
-  - "{{ redis_config_file }}:{{ redis_docker_configpath }}"
+
