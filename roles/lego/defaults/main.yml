@@ -1,5 +1,9 @@
 ---
 lego_base_path: /opt/lego
+lego_certificate_store: "{{ lego_base_path }}/certificates"
+lego_certificate_store_user: "{{ lego_user_res.uid | default(lego_user) }}"
+lego_certificate_store_group: "{{ lego_user_res.group | default(lego_user) }}"
+lego_certificate_store_mode: "0750"
 lego_systemd_path: /etc/systemd/system
 lego_version: 4.5.2
 lego_system_type: "linux"

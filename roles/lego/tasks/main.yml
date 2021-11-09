@@ -14,8 +14,17 @@
   file:
     path: "{{ lego_base_path }}"
     state: directory
-    owner: "{{ lego_user_res.uid }}"
-    group: "{{ lego_user_res.group }}"
+    owner: "{{ lego_certificate_store_user }}"
+    group: "{{ lego_certificate_store_group }}"
+    mode: "0755"
+
+- name: Ensure certificate directory exists and has the configured permissions
+  file:
+    path: "{{ lego_certificate_store }}"
+    state: directory
+    owner: "{{ lego_certificate_store_user }}"
+    group: "{{ lego_certificate_store_group }}"
+    mode: "{{ lego_certificate_store_mode }}"
 
 - name: Check if binary exsists and is the correct version
   command:
