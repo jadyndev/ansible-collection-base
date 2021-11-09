@@ -1,10 +1,10 @@
 [Unit]
 Description=lego - Let's Encrypt client written in Go
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=lego
 
 [Service]
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=lego
 {% for envvar in lego_configuration_merged.environment %}
 Environment={{ envvar }}={{ lego_configuration_merged.environment[envvar] }}
 {% endfor %}
