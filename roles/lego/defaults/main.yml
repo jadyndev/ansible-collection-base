@@ -15,7 +15,7 @@ lego_cap_net_bind_service: yes
 lego_source_url: "https://github.com/go-acme/lego/releases/download/v{{ lego_version }}/lego_v{{ lego_version }}_{{ lego_system_type }}_{{ lego_system_arch }}.tar.gz"
 lego_source_checksum_url: "sha256:https://github.com/go-acme/lego/releases/download/v{{ lego_version }}/lego_{{ lego_version }}_checksums.txt"
 
-lego_check_version_cmd: "{{ lego_executable }} --version"
+lego_check_version_cmd: "test -e {{ lego_executable }} && {{ lego_executable }} --version"
 
 lego_user: lego
 lego_timer_on_boot: "5min"

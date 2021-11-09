@@ -1,16 +1,13 @@
 ---
-- name: debug
-  debug:
-    msg: "{{ lego_command_playbook_parameters }}"
 
-- name: create lego user
+- name: Ensure lego user is created
   user:
     name: "{{ lego_user }}"
     state: present
     system: yes
   register: lego_user_res
 
-- name: create directory for lego
+- name: Ensure base directory for lego is created
   file:
     path: "{{ lego_base_path }}"
     state: directory
@@ -26,9 +23,10 @@
     group: "{{ lego_certificate_store_group }}"
     mode: "{{ lego_certificate_store_mode }}"
 
-- name: Check if binary exsists and is the correct version
-  command:
-    cmd: "{{ lego_check_version_cmd }}"
+- name: Ensure lego binary exists and has the correct version
+  shell: "{{ lego_check_version_cmd }}"
+  check_mode: false
+  changed_when: false
   ignore_errors: yes
   register: lego_version_res
 
@@ -96,7 +94,7 @@
   when: lego_acme_account is defined and lego_acme_privkey is defined
 
 
-- name: template systemd service
+- name: Ensure systemd unit file for lego is templated
   template:
     src: lego.service.j2
     dest: "{{ lego_systemd_path }}/lego.service"
@@ -107,7 +105,7 @@
     - Run lego
     - Reload systemd
 
-- name: template systemd timer
+- name: Ensure systemd timer for lego is templated
   template:
     src: lego.timer.j2
     dest: "{{ lego_systemd_path }}/lego.timer"
@@ -117,7 +115,7 @@
   notify:
     - Reload systemd
 
-- name: Flush handlers
+- name: Flush handlers to ensure systemd has loaded the unit files
   meta: flush_handlers
 
 - name: Enable lego.service
