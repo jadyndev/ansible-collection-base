@@ -34,6 +34,11 @@ class PasswordDecodeError(Exception):
         super().__init__(*args)
 
 
+class RecipientsMismatchError(Exception):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+
 class TrustLevel:
     UNKNOWN = "o"
     INVALID = "i"
@@ -66,6 +71,8 @@ class SecretStore:
         keyring: str = "pubring.kbx",
         gnupg_home: str = "~/.gnupg",
         pass_gpg_id_file: str = ".gpg-id",
+        recipient_method: str = "pass_file",
+        recipient_list: List[str] = None,
     ):
         self.password_store_path = Path(password_store_path)
         self.file_extension = file_extension
@@ -78,13 +85,26 @@ class SecretStore:
         )
         self.gpg = self.__gpg
 
-    def __load(self, slug: str) -> str:
-        file = Path(
+        # Manage recipients
+        self.recipient_method = recipient_method
+        self.recipient_list = recipient_list
+        if isinstance(self.recipient_list, list):
+            self.recipient_method = "list"
+        if recipient_method not in self.RECIPIENT_METHODS:
+            raise NotImplementedError(
+                "Recipient method {} is not supported".format(recipient_method)
+            )
+
+    def __convert_slug_to_path(self, slug: str) -> Path:
+        return Path(
             (self.password_store_path / (slug + self.file_extension))
             .expanduser()
             .absolute()
             .as_posix()
         )
+
+    def __load(self, slug: str) -> str:
+        file = self.__convert_slug_to_path(slug)
         try:
             with open(file, "rb") as f:
                 result = self.__gpg.decrypt_file(f)
@@ -95,15 +115,12 @@ class SecretStore:
         except FileNotFoundError:
             raise FileNotFoundError
 
-    def __save(self, slug: str, data: str, recipients: List[str]) -> bool:
-        file = Path(
-            (self.password_store_path / (slug + self.file_extension))
-            .expanduser()
-            .absolute()
-            .as_posix()
-        )
+    def __save(self, slug: str, data: str) -> bool:
+        file = self.__convert_slug_to_path(slug)
         Path.mkdir(file.parent, parents=True, exist_ok=True)
-        result = self.__gpg.encrypt(data.encode(self.ENCODING), recipients)
+        result = self.__gpg.encrypt(
+            data.encode(self.ENCODING), self.get_recipients(slug)
+        )
         if result.ok:
             with open(file, "wb") as f:
                 f.write(result.data)
@@ -111,11 +128,39 @@ class SecretStore:
         else:
             raise GPGException(result.status)
 
-    def get(self, slug: str, data_type: str = "plain") -> Union[str, dict, list]:
+    def get_recipients_from_encrypted_file(self, slug) -> List[str]:
+        file = self.__convert_slug_to_path(slug)
+        recipients = list()
+        try:
+            with open(file, "rb") as f:
+                recipient_subkeys = self.__gpg.get_recipients(f.read())
+            for recipient_subkey in recipient_subkeys:
+                recipients.append(
+                    self.__gpg.list_keys(keys=recipient_subkey).fingerprints[0]
+                )
+            return recipients
+        except FileNotFoundError:
+            raise FileNotFoundError
+
+    def get(
+        self, slug: str, data_type: str = "plain", check_recipients: bool = True
+    ) -> Union[str, dict, list]:
         data_type = data_type.lower()
 
         if data_type not in self.SUPPORTED_TYPES:
             raise NotImplementedError("Datatype %s is not supported".format(data_type))
+
+        if check_recipients:
+            file_recipients = self.get_recipients_from_encrypted_file(slug)
+            expected_recipients = self.get_recipients(slug)
+
+            for file_recipient in file_recipients:
+                if file_recipient in expected_recipients:
+                    expected_recipients.remove(file_recipient)
+                else:
+                    raise RecipientsMismatchError
+            if len(expected_recipients) > 0:
+                raise RecipientsMismatchError
 
         raw = self.__load(slug)
         try:
@@ -127,6 +172,18 @@ class SecretStore:
                 return yaml.safe_load(raw)
         except (json.decoder.JSONDecodeError, yaml.YAMLError) as e:
             raise PasswordDecodeError
+
+    def get_recipients(self, slug: str) -> List[str]:
+        recipients = list()
+        if self.recipient_method == "keyring":
+            recipients = self.__get_recipients_from_keyring()
+        if self.recipient_method == "pass_file":
+            recipients = self.__get_recipients_from_pass_file(slug)
+        if self.recipient_method == "list":
+            recipients = self.recipient_list
+        if len(recipients) == 0:
+            raise PasswordStoreException("Empty recipient  list")
+        return recipients
 
     def __get_recipients_from_keyring(self) -> List[str]:
         recipients = []
@@ -152,14 +209,7 @@ class SecretStore:
         with open(base_path / self.pass_gpg_id_file) as f:
             return f.read().splitlines()
 
-    def put(
-        self,
-        slug: str,
-        data: Union[str, dict, list],
-        data_type: str = None,
-        recipient_method: str = "pass_file",
-        recipients_list: List[str] = None,
-    ):
+    def put(self, slug: str, data: Union[str, dict, list], data_type: str = None):
         if not isinstance(data, str) and data_type is None:
             data_type = "yaml"
         elif isinstance(data, str) and data_type is None:
@@ -168,6 +218,7 @@ class SecretStore:
         if data_type not in self.SUPPORTED_TYPES:
             raise NotImplementedError("Datatype {} is not supported".format(data_type))
 
+        result = None
         if data_type == "plain":
             result = data
         if data_type == "json":
@@ -175,18 +226,15 @@ class SecretStore:
         if data_type == "yaml":
             result = yaml.safe_dump(data)
 
-        if isinstance(recipients_list, list):
-            recipient_method = "list"
-        if recipient_method not in self.RECIPIENT_METHODS:
-            raise NotImplementedError(
-                "Recipient method {} is not supported".format(recipient_method)
-            )
-        if recipient_method == "keyring":
-            recipients = self.__get_recipients_from_keyring()
-        if recipient_method == "pass_file":
-            recipients = self.__get_recipients_from_pass_file(slug)
-        if recipient_method == "list":
-            recipients = recipients_list
-        if len(recipients) == 0:
-            raise PasswordStoreException("Empty recipient  list")
-        self.__save(slug, result, recipients)
+        self.__save(slug, result)
+
+    def remove(self, slug: str):
+        file = self.__convert_slug_to_path(slug)
+        os.remove(file)
+        path = file.parent
+        while True:
+            try:
+                os.rmdir(path)
+                path = path.parent
+            except (OSError, FileNotFoundError):
+                break
