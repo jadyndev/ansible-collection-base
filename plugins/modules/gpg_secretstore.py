@@ -283,7 +283,7 @@ def main():
             secret_pattern=dict(required=False, type="str", default="([A-Za-z0-9])"),
             user_supplied_secret=dict(required=False, type="str", no_log=True),
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     # Check if gnupg is present
@@ -373,7 +373,7 @@ def main():
                 result["action"] = "update"
                 result["changed"] = True
 
-            if result["changed"]:
+            if result["changed"] and not module.check_mode:
                 store.put(
                     slug=password_slug, data=result["secret"], data_type=data_type
                 )
@@ -383,7 +383,10 @@ def main():
 
         if state == "absent":
             try:
-                store.remove(slug=password_slug)
+                if module.check_mode:
+                    store.get(slug=password_slug, data_type=data_type)
+                else:
+                    store.remove(slug=password_slug)
                 result["message"] = "Secret will be deleted!"
                 result["diff"]["before"] = store.get_recipients_from_encrypted_file(
                     slug=password_slug
