@@ -63,6 +63,13 @@ options:
         required: False
         type: str
         default: .gpg-id
+    state:
+        description:
+            - Whether the password file should exist
+        required: True
+        type: str
+        choices: 'present', 'absent'
+        default: 'present'
     password_slug
         description:
             - Password slug, something like `servers/prod/some_secret`
@@ -250,6 +257,12 @@ def main():
                 required=False, type="str", default=".gpg-id", no_log=False
             ),
             # Password specific arguments
+            state=dict(
+                required=False,
+                type="str",
+                choices=["present", "absent"],
+                default="present",
+            ),
             password_slug=dict(required=True, type="str", no_log=False),
             data_type=dict(
                 required=False,
@@ -321,46 +334,69 @@ def main():
         (Path("/tmp/") / hashlib.md5(password_slug.encode()).hexdigest()).as_posix()
     )
     with lock:
-        try:
-            result["diff"]["before"] = store.get_recipients_from_encrypted_file(
-                slug=password_slug
-            )
-            if not overwrite:
-                result["secret"] = store.get(slug=password_slug, data_type=data_type)
-                result["changed"] = False
-            else:
-                result["message"] = "Secret rotation requested: rotating, if possible."
+        if state == "present":
+            try:
+                result["diff"]["before"] = store.get_recipients_from_encrypted_file(
+                    slug=password_slug
+                )
+                if not overwrite:
+                    result["secret"] = store.get(
+                        slug=password_slug, data_type=data_type
+                    )
+                    result["changed"] = False
+                else:
+                    result[
+                        "message"
+                    ] = "Secret rotation requested: rotating, if possible."
+                    result["secret"] = secretGenerator.getSecret()
+                    result["action"] = "update"
+                    result["changed"] = True
+                result["diff"]["after"] = result["diff"]["before"]
+
+            except FileNotFoundError:
+                result["message"] = "Secret not found! Generation new secret"
                 result["secret"] = secretGenerator.getSecret()
+                result["diff"]["before"] = []
+                result["diff"]["after"] = store.get_recipients(slug=password_slug)
+                result["action"] = "add"
+                result["changed"] = True
+
+            except RecipientsMismatchError:
+                result["warning"] = "Secret-Recipient-Mismatch! Re-encrypting."
+                result["secret"] = store.get(
+                    slug=password_slug, data_type=data_type, check_recipients=False
+                )
+                result["diff"]["before"] = store.get_recipients_from_encrypted_file(
+                    slug=password_slug
+                )
+                result["diff"]["after"] = store.get_recipients(slug=password_slug)
                 result["action"] = "update"
                 result["changed"] = True
-            result["diff"]["after"] = result["diff"]["before"]
 
-        except FileNotFoundError:
-            result["message"] = "Secret not found! Generation new secret"
-            result["secret"] = secretGenerator.getSecret()
-            result["diff"]["before"] = []
-            result["diff"]["after"] = store.get_recipients(slug=password_slug)
-            result["action"] = "add"
-            result["changed"] = True
+            if result["changed"]:
+                store.put(
+                    slug=password_slug, data=result["secret"], data_type=data_type
+                )
+                result["diff"]["after"] = store.get_recipients_from_encrypted_file(
+                    slug=password_slug
+                )
 
-        except RecipientsMismatchError:
-            result["warning"] = "Secret-Recipient-Mismatch! Re-encrypting."
-            result["secret"] = store.get(
-                slug=password_slug, data_type=data_type, check_recipients=False
-            )
-            result["diff"]["before"] = store.get_recipients_from_encrypted_file(
-                slug=password_slug
-            )
-            result["diff"]["after"] = store.get_recipients(slug=password_slug)
-            result["action"] = "update"
-            result["changed"] = True
+        if state == "absent":
+            try:
+                store.remove(slug=password_slug)
+                result["message"] = "Secret will be deleted!"
+                result["diff"]["before"] = store.get_recipients_from_encrypted_file(
+                    slug=password_slug
+                )
+                result["diff"]["after"] = []
+                result["action"] = "remove"
+                result["changed"] = True
 
-        if not module.check_mode and result["changed"]:
-            store.put(slug=password_slug, data=result["secret"], data_type=data_type)
-
-        result["diff"]["after"] = store.get_recipients_from_encrypted_file(
-            slug=password_slug
-        )
+            except FileNotFoundError:
+                result["message"] = "Secret didn't exist"
+                result["diff"]["before"] = []
+                result["diff"]["after"] = []
+                result["changed"] = False
 
     if result["message"]:
         module.log(result["message"])
