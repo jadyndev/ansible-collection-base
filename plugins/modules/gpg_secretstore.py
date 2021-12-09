@@ -25,6 +25,7 @@ author:
     - Jan Christian Grünhage (@jcgruenhage)
     - Lars Kaiser (@lrsksr)
 requirements:
+    - GitPython >= 3.1.24
     - PyYAML >= 6.0
     - filelock >= 3.0.12
     - python >= 3.7
@@ -189,6 +190,7 @@ warning:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import *
 from ansible.utils.display import Display
+from git import Repo
 
 LIB_IMP_ERR = None
 try:
@@ -388,6 +390,10 @@ def main():
                 store.put(
                     slug=password_slug, data=result["secret"], data_type=data_type
                 )
+                _commit_changes(
+                    module.params["password_store_path"],
+                    password_slug + module.params["file_extension"],
+                )
                 result["diff"]["after"] = store.get_recipients_from_encrypted_file(
                     slug=password_slug
                 )
@@ -398,6 +404,11 @@ def main():
                     store.get(slug=password_slug, data_type=data_type)
                 else:
                     store.remove(slug=password_slug)
+                    _commit_changes(
+                        module.params["password_store_path"],
+                        password_slug + module.params["file_extension"],
+                        True,
+                    )
                 result["message"] = "Secret will be deleted!"
                 result["diff"]["before"] = store.get_recipients_from_encrypted_file(
                     slug=password_slug
@@ -405,7 +416,6 @@ def main():
                 result["diff"]["after"] = []
                 result["action"] = "remove"
                 result["changed"] = True
-
             except FileNotFoundError:
                 result["message"] = "Secret didn't exist"
                 result["diff"]["before"] = []
@@ -425,6 +435,23 @@ def main():
         module.fail_json(**result)
     else:
         module.exit_json(**result)
+
+
+def _commit_changes(repo_path: str, file_path: str, remove: bool = False):
+    repo = Repo(repo_path)
+    if remove:
+        message = f"Remove secret {file_path}"
+        repo.index.remove(file_path)
+    else:
+        try:
+            repo.tree() / file_path
+            message = f"Update secret {file_path}"
+        except KeyError:
+            message = f"Add secret {file_path}"
+        repo.index.add(file_path)
+    repo.index.write()
+    # Using the direct git call as signed commits are not possible using git plumbing
+    repo.git.commit("-m", message)
 
 
 if __name__ == "__main__":
