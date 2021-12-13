@@ -22,6 +22,7 @@ DOCUMENTATION = r"""
 module: gpg_secretstore
 author:
     - Jadyn Emma Jäger (@jadyndev)
+    - Jan Christian Grünhage (@jcgruenhage)
     - Lars Kaiser (@lrsksr)
 requirements:
     - PyYAML >= 6.0
@@ -84,6 +85,11 @@ options:
         type: str
         choices: 'plain', 'yaml', 'json'
         default: 'plain'
+    secret_fact:
+        description:
+            - If `secret_fact` is set and `state` is `present`, the module will set the secret return value under the contained key as an ansible fact
+        required: False
+        type: str
     overwrite:
         description:
             - Forces the regeneration of a secret
@@ -270,6 +276,7 @@ def main():
                 choices=["plain", "yaml", "json"],
                 default="plain",
             ),
+            secret_fact=dict(required=False, type="str"),
             # Password generation arguments
             overwrite=dict(required=False, type="bool", default="false"),
             secret_type=dict(
@@ -320,6 +327,7 @@ def main():
         warning="",
         password_slug=module.params["password_slug"],
         secret="",
+        ansible_facts={},
         diff={
             "before_header": "{} gpg recipients".format(password_slug),
             "after_header": "{} gpg recipients".format(password_slug),
@@ -372,6 +380,9 @@ def main():
                 result["diff"]["after"] = store.get_recipients(slug=password_slug)
                 result["action"] = "update"
                 result["changed"] = True
+
+            if module.params["secret_fact"]:
+                result["ansible_facts"][module.params["secret_fact"]] = result["secret"]
 
             if result["changed"] and not module.check_mode:
                 store.put(
