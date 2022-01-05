@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-# (c) 2021, Famedly GmbH
+# (c) 2021-2022, Famedly GmbH
 # GNU Affero General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/agpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -189,7 +189,6 @@ warning:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import *
-from ansible.utils.display import Display
 from git import Repo
 
 LIB_IMP_ERR = None
@@ -201,8 +200,6 @@ try:
 except ImportError:
     HAS_LIB = False
     LIB_IMP_ERR = traceback.format_exc()
-
-logging = Display()
 
 
 class SecretGenerator:

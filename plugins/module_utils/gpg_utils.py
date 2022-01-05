@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-# (c) 2021, Famedly GmbH
+# (c) 2021-2022, Famedly GmbH
 # GNU Affero General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/agpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
