@@ -189,11 +189,11 @@ warning:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import *
-from git import Repo
 
 LIB_IMP_ERR = None
 try:
     from filelock import FileLock
+    from git import Repo
     import gnupg
 
     HAS_LIB = True
@@ -435,20 +435,24 @@ def main():
 
 
 def _commit_changes(repo_path: str, file_path: str, remove: bool = False):
-    repo = Repo(repo_path)
-    if remove:
-        message = f"Remove secret {file_path}"
-        repo.index.remove(file_path)
-    else:
-        try:
-            repo.tree() / file_path
-            message = f"Update secret {file_path}"
-        except KeyError:
-            message = f"Add secret {file_path}"
-        repo.index.add(file_path)
-    repo.index.write()
-    # Using the direct git call as signed commits are not possible using git plumbing
-    repo.git.commit("-m", message)
+    lock = FileLock(
+        (Path("/tmp/") / hashlib.md5(repo_path.encode()).hexdigest()).as_posix()
+    )
+    with lock:
+        repo = Repo(repo_path)
+        if remove:
+            message = f"Remove secret {file_path}"
+            repo.index.remove(file_path)
+        else:
+            try:
+                repo.tree() / file_path
+                message = f"Update secret {file_path}"
+            except KeyError:
+                message = f"Add secret {file_path}"
+            repo.index.add(file_path)
+        repo.index.write()
+        # Using the direct git call as signed commits are not possible using git plumbing
+        repo.git.commit("-m", message)
 
 
 if __name__ == "__main__":
