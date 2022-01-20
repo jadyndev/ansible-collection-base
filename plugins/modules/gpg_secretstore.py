@@ -205,8 +205,9 @@ except ImportError:
 class SecretGenerator:
     ALLOWED_SECRET_TYPES = ["random", "binary", "user_supplied"]
 
-    def __init__(self, secret_type: str = "random", **kwargs):
+    def __init__(self, secret_type: str = "random", data_type: str = "plain", **kwargs):
         self.secret_type = secret_type.lower()
+        self.data_type = data_type.lower()
         self.kwargs = kwargs
         if self.secret_type not in self.ALLOWED_SECRET_TYPES:
             raise NotImplementedError(
@@ -222,6 +223,17 @@ class SecretGenerator:
             return self.__userSuppliedSecret(**self.kwargs)
         raise NotImplementedError(
             "Secret type {} is not supported".format(self.secret_type)
+        )
+
+    def getSecretData(self):
+        if self.data_type == "plain":
+            return self.getSecret()
+        if self.data_type == "json":
+            return json.loads(self.getSecret())
+        if self.data_type == "yaml":
+            return yaml.safe_load(self.getSecret())
+        raise NotImplementedError(
+            "Data type {} is not supported".format(self.secret_type)
         )
 
     @staticmethod
@@ -355,14 +367,14 @@ def main():
                     result[
                         "message"
                     ] = "Secret rotation requested: rotating, if possible."
-                    result["secret"] = secretGenerator.getSecret()
+                    result["secret"] = secretGenerator.getSecretData()
                     result["action"] = "update"
                     result["changed"] = True
                 result["diff"]["after"] = result["diff"]["before"]
 
             except FileNotFoundError:
                 result["message"] = "Secret not found! Generation new secret"
-                result["secret"] = secretGenerator.getSecret()
+                result["secret"] = secretGenerator.getSecretData()
                 result["diff"]["before"] = []
                 result["diff"]["after"] = store.get_recipients(slug=password_slug)
                 result["action"] = "add"
