@@ -88,7 +88,8 @@ options:
         default: 'plain'
     secret_fact:
         description:
-            - If `secret_fact` is set and `state` is `present`, the module will set the secret return value under the contained key as an ansible fact
+            - If `secret_fact` is set and `state` is `present`, the module will set the secret return value under the contained key as an ansible fact.
+            - WARNING: If you have a persistent cache configured, the secret will be cached in plain text.
         required: False
         type: str
     overwrite:
