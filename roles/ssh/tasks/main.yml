@@ -132,3 +132,11 @@
     line: "LogLevel {{ ssh_loglevel }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
+
+- name: Listen on address family {{ ssh_address_family }}
+  lineinfile:
+    <<: *sshd_config_args
+    regexp: '^#?AddressFamily'
+    line: "AddressFamily {{ ssh_address_family }}"
+  notify: reload sshd
+  tags: ['prepare', 'prepare-sshd']
