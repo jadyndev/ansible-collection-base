@@ -10,7 +10,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?PasswordAuthentication"
-    line: "PasswordAuthentication no"
+    line: "PasswordAuthentication {{ sshd_config_password_authentication | ternary('yes', 'no') }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
 
@@ -18,7 +18,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?ChallengeResponseAuthentication"
-    line: "ChallengeResponseAuthentication no"
+    line: "ChallengeResponseAuthentication {{ sshd_config_challenge_response_authentication | ternary('yes', 'no') }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
 
@@ -26,7 +26,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?PubkeyAuthentication"
-    line: "PubkeyAuthentication yes"
+    line: "PubkeyAuthentication {{ sshd_config_pubkey_authentication | ternary('yes', 'no') }}"
     firstmatch: yes
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
@@ -35,7 +35,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?PermitRootLogin"
-    line: "PermitRootLogin no"
+    line: "PermitRootLogin {{ sshd_config_root_login | ternary('yes', 'no') }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
 
@@ -43,7 +43,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?ClientAliveInterval"
-    line: "ClientAliveInterval 300"
+    line: "ClientAliveInterval {{ sshd_config_client_alive_interval }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
 
@@ -51,7 +51,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?Protocol"
-    line: "Protocol 2"
+    line: "Protocol {{ sshd_config_protocol }}"
     insertafter: &cipher_after "^# Ciphers and keying"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
@@ -60,7 +60,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?X11Forwarding"
-    line: "X11Forwarding no"
+    line: "X11Forwarding {{ sshd_config_x11_forwarding | ternary('yes', 'no') }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
 
@@ -68,7 +68,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?AllowAgentForwarding"
-    line: "AllowAgentForwarding no"
+    line: "AllowAgentForwarding {{ sshd_config_allow_agent_forwarding | ternary('yes', 'no') }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
 
@@ -76,7 +76,7 @@
   lineinfile:
     <<: *sshd_config_args
     regexp: "^#?AllowTcpForwarding"
-    line: "AllowTcpForwarding no"
+    line: "AllowTcpForwarding {{ sshd_config_allow_tcp_forwarding | ternary('yes', 'no') }}"
   notify: reload sshd
   tags: ['prepare', 'prepare-sshd']
 
