@@ -118,13 +118,13 @@
 
     - name: Compare SANs, notify handler if they differ
       ansible.builtin.set_fact:
-        lego_certificate_sans_differ: >-2
+        lego_certificate_sans_equal: >-2
           {{
-            lego_certificate.domains is not superset(lego_certificate_sans)
-            and lego_certificate.domains is not subset(lego_certificate_sans)
+            lego_certificate.domains is superset(lego_certificate_sans)
+            and lego_certificate.domains is subset(lego_certificate_sans)
           }}
       when: lego_certificate_stat.stat.exists
-      changed_when: lego_certificate_sans_differ
+      changed_when: not lego_certificate_sans_equal
       notify:
         - Run lego
 
