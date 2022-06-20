@@ -17,6 +17,9 @@ ExecStartPre=+-chmod {{ lego_certificate_store_mode }} {{ lego_certificate_store
 ExecStart={{ lego_command_systemd }}
 ExecStartPost=+-/bin/sh -c 'chown {{ lego_certificate_store_user }}:{{ lego_certificate_store_group }} {{ lego_certificate_store }}/*'
 ExecStartPost=+-/bin/sh -c 'chmod 0640 {{ lego_certificate_store }}/*'
+{% if lego_post_renewal_script is defined %}
+ExecStartPost=+-{{ lego_post_renewal_script }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
