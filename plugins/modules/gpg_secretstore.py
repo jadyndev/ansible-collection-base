@@ -309,7 +309,9 @@ def main():
                 required=False, type="str", default="~/.password-store/", no_log=False
             ),
             file_extension=dict(required=False, type="str", default=".gpg"),
-            keyring=dict(required=False, type="str", default="pubring.kbx"),
+            keyring=dict(
+                required=False, type="str", default="pubring.kbx", no_log=False
+            ),
             gnupg_home=dict(required=False, type="str", default="~/.gnupg"),
             pass_gpg_id_file=dict(
                 required=False, type="str", default=".gpg-id", no_log=False
@@ -328,7 +330,7 @@ def main():
                 choices=["plain", "yaml", "json"],
                 default="plain",
             ),
-            secret_fact=dict(required=False, type="str"),
+            secret_fact=dict(required=False, type="str", no_log=False),
             # Password generation arguments
             overwrite=dict(required=False, type="bool", default="false"),
             secret_type=dict(
@@ -336,10 +338,13 @@ def main():
                 type="str",
                 choices=["random", "binary", "user_supplied"],
                 default="random",
+                no_log=False,
             ),
-            secret_binary=dict(required=False, type="str"),
-            secret_length=dict(required=False, type="int", default=20),
-            secret_pattern=dict(required=False, type="str", default="([A-Za-z0-9])"),
+            secret_binary=dict(required=False, type="str", no_log=False),
+            secret_length=dict(required=False, type="int", default=20, no_log=False),
+            secret_pattern=dict(
+                required=False, type="str", default="([A-Za-z0-9])", no_log=False
+            ),
             user_supplied_secret=dict(required=False, type="str", no_log=True),
         ),
         supports_check_mode=True,
