@@ -13,10 +13,40 @@ __metaclass__ = type
 import os.path
 from pathlib import Path
 from typing import Union
+import traceback
 
-import gnupg
-import json
-import yaml
+
+try:
+    import gnupg
+except ImportError as imp_exc:
+    GNUPG_IMPORT_ERROR = imp_exc
+else:
+    GNUPG_IMPORT_ERROR = None
+
+try:
+    import json
+except ImportError as imp_exc:
+    JSON_IMPORT_ERROR = imp_exc
+else:
+    JSON_IMPORT_ERROR = None
+
+try:
+    import yaml
+except ImportError as imp_exc:
+    YAML_IMPORT_ERROR = imp_exc
+else:
+    YAML_IMPORT_ERROR = None
+
+
+def check_secretstore_import_errors():
+    errors = {}
+    if GNUPG_IMPORT_ERROR:
+        errors["gnupg"] = GNUPG_IMPORT_ERROR
+    if JSON_IMPORT_ERROR:
+        errors["json"] = JSON_IMPORT_ERROR
+    if YAML_IMPORT_ERROR:
+        errors["yaml"] = YAML_IMPORT_ERROR
+    return errors
 
 
 class GPGException(Exception):

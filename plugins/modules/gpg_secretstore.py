@@ -8,9 +8,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import hashlib
-import traceback
-
 ANSIBLE_METADATA = {
     "metadata_version": "1.1",
     "status": ["preview"],
@@ -188,19 +185,62 @@ warning:
     type: str
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import *
+import hashlib
+import traceback
+from pathlib import Path
 
-LIB_IMP_ERR = None
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import (
+    SecretStore,
+    RecipientsMismatchError,
+    check_secretstore_import_errors,
+)
+
 try:
     from filelock import FileLock
-    from git import Repo
-    import gnupg
+except ImportError as imp_exc:
+    FILELOCK_IMPORT_ERROR = imp_exc
+else:
+    FILELOCK_IMPORT_ERROR = None
 
-    HAS_LIB = True
-except ImportError:
-    HAS_LIB = False
-    LIB_IMP_ERR = traceback.format_exc()
+try:
+    from git import Repo
+except ImportError as imp_exc:
+    GIT_IMPORT_ERROR = imp_exc
+else:
+    GIT_IMPORT_ERROR = None
+
+try:
+    import gnupg
+except ImportError as imp_exc:
+    GNUPG_IMPORT_ERROR = imp_exc
+else:
+    GNUPG_IMPORT_ERROR = None
+
+try:
+    import json
+except ImportError as imp_exc:
+    JSON_IMPORT_ERROR = imp_exc
+else:
+    JSON_IMPORT_ERROR = None
+
+try:
+    import yaml
+except ImportError as imp_exc:
+    YAML_IMPORT_ERROR = imp_exc
+else:
+    YAML_IMPORT_ERROR = None
+
+
+def check_module_import_errors():
+    errors = {}
+    if GNUPG_IMPORT_ERROR:
+        errors["gnupg"] = GNUPG_IMPORT_ERROR
+    if JSON_IMPORT_ERROR:
+        errors["json"] = JSON_IMPORT_ERROR
+    if YAML_IMPORT_ERROR:
+        errors["yaml"] = YAML_IMPORT_ERROR
+    return errors
 
 
 class SecretGenerator:
@@ -305,11 +345,15 @@ def main():
         supports_check_mode=True,
     )
 
-    # Check if gnupg is present
-    if not HAS_LIB:
-        module.fail_json(
-            msg=missing_required_lib("python-gnupg"), exception=LIB_IMP_ERR
-        )
+    errors = []
+    traceback = []
+    for lib, exception in (
+        check_secretstore_import_errors().items() + check_module_import_errors().items()
+    ):
+        errors.append(missing_required_lib(lib))
+        traceback.append(exception)
+    if errors:
+        module.fail_json(errors=errors, traceback="\n".join(traceback))
 
     store = SecretStore(
         password_store_path=module.params["password_store_path"],
