@@ -252,7 +252,7 @@ class SecretGenerator:
         self.kwargs = kwargs
         if self.secret_type not in self.ALLOWED_SECRET_TYPES:
             raise NotImplementedError(
-                "Secret type {} is not supported".format(secret_type)
+                "Secret type {0} is not supported".format(secret_type)
             )
 
     def getSecret(self):
@@ -263,7 +263,7 @@ class SecretGenerator:
         if self.secret_type == "user_supplied":
             return self.__userSuppliedSecret(**self.kwargs)
         raise NotImplementedError(
-            "Secret type {} is not supported".format(self.secret_type)
+            "Secret type {0} is not supported".format(self.secret_type)
         )
 
     def getSecretData(self):
@@ -274,7 +274,7 @@ class SecretGenerator:
         if self.data_type == "yaml":
             return yaml.safe_load(self.getSecret())
         raise NotImplementedError(
-            "Data type {} is not supported".format(self.secret_type)
+            "Data type {0} is not supported".format(self.secret_type)
         )
 
     @staticmethod
@@ -385,8 +385,8 @@ def main():
         secret="",
         ansible_facts={},
         diff={
-            "before_header": "{} gpg recipients".format(password_slug),
-            "after_header": "{} gpg recipients".format(password_slug),
+            "before_header": "{0} gpg recipients".format(password_slug),
+            "after_header": "{0} gpg recipients".format(password_slug),
             "before": [],
             "after": [],
         },

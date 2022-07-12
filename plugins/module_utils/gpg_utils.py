@@ -122,7 +122,7 @@ class SecretStore:
             self.recipient_method = "list"
         if recipient_method not in self.RECIPIENT_METHODS:
             raise NotImplementedError(
-                "Recipient method {} is not supported".format(recipient_method)
+                "Recipient method {0} is not supported".format(recipient_method)
             )
 
     def __convert_slug_to_path(self, slug: str) -> Path:
@@ -178,7 +178,7 @@ class SecretStore:
         data_type = data_type.lower()
 
         if data_type not in self.SUPPORTED_TYPES:
-            raise NotImplementedError("Datatype %s is not supported".format(data_type))
+            raise NotImplementedError("Datatype {0} is not supported".format(data_type))
 
         if check_recipients:
             file_recipients = self.get_recipients_from_encrypted_file(slug)
@@ -234,7 +234,7 @@ class SecretStore:
             base_path = base_path.parent
         else:
             raise FileNotFoundError(
-                "Could not find {} in tree".format(self.pass_gpg_id_file)
+                "Could not find {0} in tree".format(self.pass_gpg_id_file)
             )
         with open(base_path / self.pass_gpg_id_file) as f:
             return f.read().splitlines()
@@ -246,7 +246,7 @@ class SecretStore:
             data_type = "plain"
 
         if data_type not in self.SUPPORTED_TYPES:
-            raise NotImplementedError("Datatype {} is not supported".format(data_type))
+            raise NotImplementedError("Datatype {0} is not supported".format(data_type))
 
         result = None
         if data_type == "plain":
