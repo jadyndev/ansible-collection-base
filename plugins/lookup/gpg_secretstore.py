@@ -8,28 +8,29 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
-    name: gpg_secretstore
-    author:
-      - Jadyn Emma Jäger (@jadyndev)
-      - Jan Christian Grünhage (@jcgruenhage)
-    short_description: read passwords that are compatible with passwordstore.org's pass utility
-    description:
-      - Enables Ansible to read passwords/secrets from the passwordstore.org pass utility.
-        It's also able to read yaml/json files if needed
-    options:
-      _terms:
-        description: query key.
-        required: True
-      data-type:
-        description: If the decrypted data should be interpreted as yaml, json or plain text.
-        default: 'plain'
-        options:
-            - yaml
-            - json
-            - plain
+DOCUMENTATION = r"""
+---
+name: gpg_secretstore
+author:
+    - Jadyn Emma Jäger (@jadyndev)
+    - Jan Christian Grünhage (@jcgruenhage)
+short_description: read passwords that are compatible with passwordstore.org's pass utility
+description:
+  - Enables Ansible to read passwords/secrets from the passwordstore.org pass utility.
+  - It's also able to read yaml/json files if needed
+options:
+  _terms:
+    description: Slug of the secret being read from the store.
+    required: True
+  data-type:
+    description: If the decrypted data should be interpreted as yaml, json or plain text.
+    default: 'plain'
+    choices:
+        - yaml
+        - json
+        - plain
 """
-EXAMPLES = """
+EXAMPLES = r"""
 # Debug is used for examples, BAD IDEA to show passwords on screen
 - name: lookup password without type
   debug:
@@ -56,12 +57,10 @@ EXAMPLES = """
     mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/json', 'json')}}"
 """
 
-RETURN = """
+RETURN = r"""
 _raw:
-  description:
-    - a password
-  type: list
-  elements: str
+  description: a password
+  type: string
 """
 
 from ansible.plugins.lookup import LookupBase
