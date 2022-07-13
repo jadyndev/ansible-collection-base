@@ -22,39 +22,36 @@ options:
   _terms:
     description: Slug of the secret being read from the store.
     required: True
-  data-type:
+  data_type:
     description: If the decrypted data should be interpreted as yaml, json or plain text.
     default: 'plain'
     choices:
         - yaml
         - json
         - plain
+  password_store_path:
+    description: Where to look for the password store
+    default: '~/.password-store'
 """
 EXAMPLES = r"""
 # Debug is used for examples, BAD IDEA to show passwords on screen
-- name: lookup password without type
+- name: lookup password
   debug:
     var: mypassword
   vars:
-    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/plain')}}"
+    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example')}}"
 
-- name: lookup password with type plain
+- name: lookup password and parse yaml
   debug:
     var: mypassword
   vars:
-    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/plain', 'plain')}}"
+    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/yaml', 'data_type=yaml')}}"
 
-- name: lookup password with type yaml
+- name: lookup password from non-default password-store location
   debug:
     var: mypassword
   vars:
-    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/yaml', 'yaml')}}"
-
-- name: lookup password with type json
-  debug:
-    var: mypassword
-  vars:
-    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/json', 'json')}}"
+    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/temporary', 'password_store_path=/tmp/temporary-store')}}"
 """
 
 RETURN = r"""
@@ -67,6 +64,7 @@ from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.six import raise_from
 from ansible.module_utils.basic import missing_required_lib
 from ansible.errors import AnsibleError
+from ansible.parsing.splitter import parse_kv
 from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import (
     SecretStore,
     check_secretstore_import_errors,
@@ -85,10 +83,15 @@ class LookupModule(LookupBase):
                 AnsibleError("\n".join(errors)),
                 "\n".join(traceback),
             )
+
         if len(terms) == 1:
-            data_type = "plain"
+            params = {}
         else:
-            data_type = terms[1]
-        password_store = SecretStore()
+            params = parse_kv(terms[1])
+
+        data_type = params.get("_raw_params", params.get("data_type", "plain"))
+        password_store_path = params.get("password_store_path", "~/.password-store/")
+
+        password_store = SecretStore(password_store_path=password_store_path)
         result = password_store.get(terms[0], data_type)
         return [result]
