@@ -353,9 +353,8 @@ def main():
 
     errors = []
     traceback = []
-    for lib, exception in (
-        check_secretstore_import_errors().items() + check_module_import_errors().items()
-    ):
+    error_map = check_secretstore_import_errors() | check_module_import_errors()
+    for lib, exception in error_map.items():
         errors.append(missing_required_lib(lib))
         traceback.append(exception)
     if errors:
