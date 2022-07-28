@@ -10,8 +10,7 @@ ldap_base_schemas_to_load:
   - name: cosine.ldif
   - name: inetorgperson.ldif
 ldap_schemas_to_load: >-
-  {{ ldap_base_schemas_to_load }}
-  + {{ ldap_additional_schemas }}
+  {{ ldap_base_schemas_to_load + ldap_additional_schemas }}
 
 
 ldap_container_volumes:

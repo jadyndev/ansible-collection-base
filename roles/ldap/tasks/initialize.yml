@@ -34,8 +34,7 @@
 - name: (init) Map additional schemas into container
   set_fact:
     ldap_init_container_additional_volumes: >-
-      {{ ldap_init_container_additional_volumes }}
-      + {{ volume_mount }}
+      {{ ldap_init_container_additional_volumes + volume_mount }}
   vars:
     schema_file: "{{ ldap_base_path }}/{{ schema.name }}"
     volume_mount:
