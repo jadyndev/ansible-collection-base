@@ -121,7 +121,7 @@
     login_host: "{{ postgresql_connection.login_host }}"
   tags: [ 'deploy', 'deploy-postgresql' ]
   register: postgresql_superuser_password_result
-  until: postgresql_superuser_password_result
+  until: postgresql_superuser_password_result is succeeded
   retries: 5
   delay: 3
 
