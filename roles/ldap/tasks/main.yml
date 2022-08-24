@@ -43,6 +43,7 @@
     memory: "{{ ldap_container_memory }}"
     recreate: "{{ ldap_container_recreate }}"
     restart_policy: unless-stopped
+    command: "{{ ldap_container_command | default(omit) }}"
     state: started
     healthcheck:
       test: >-
