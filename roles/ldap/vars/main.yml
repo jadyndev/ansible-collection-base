@@ -13,7 +13,8 @@ ldap_schemas_to_load: >-
   {{ ldap_base_schemas_to_load + ldap_additional_schemas }}
 
 
-ldap_container_volumes:
+ldap_container_volumes: "{{ ldap_container_volumes_base + ldap_container_extra_volumes | default([]) }}"
+ldap_container_volumes_base:
   - "{{ ldap_config_path }}:{{ ldap_container_conf_dir }}:z"
   - "{{ ldap_data_path }}:{{ ldap_container_data_dir}}:z"
   - "{{ ldap_sock_path }}:{{ ldap_container_socket_dir }}:z"
