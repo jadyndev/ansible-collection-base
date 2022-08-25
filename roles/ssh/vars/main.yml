@@ -42,4 +42,3 @@ ssh_bsi_recommended_presets:
   - ssh-rsa
   allowed_pubkey_algos:
     - "-ssh-dss"
-

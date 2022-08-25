@@ -12,4 +12,3 @@ dns_sshfp_type:
   "SHA-2": 2
 
 dns_all_hostnames: "{{ [ { 'name': dns_host_name_short } ] + dns_host_names }}"
-
