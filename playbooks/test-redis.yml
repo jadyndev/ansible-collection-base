@@ -1,6 +1,6 @@
 ---
-- hosts: [ localhost ]
-  become: yes
+- hosts: [localhost]
+  become: true
   collections:
     - famedly.base
   roles:
