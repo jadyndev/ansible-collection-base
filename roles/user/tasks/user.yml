@@ -1,17 +1,19 @@
-- name: "create user {{ user.name }}"
+---
+- name: "Ensure user {{ user.name }} is {{ user.attrs.active | default(false) | ternary('present', 'absent') }}"
   user:
     name: "{{ user.name }}"
-    shell: "/bin/bash"
-    groups: []
-    comment: "{{ user.gecos | default(omit) }}"
-  become: yes
+    shell: "{{ user.attrs.shell | default(omit) }}"
+    groups: "{{ user.attrs.groups | default([]) }}"
+    comment: "{{ user.attrs.gecos | default(omit) }}"
+    password: "{{ user.attrs.password | default(omit) }}"
+    uid: "{{ user.attrs.uid | default(omit) }}"
+    state: "{{ user.attrs.active | default(false) | ternary('present', 'absent') }}"
+  become: true
 
-- name: "add ssh key for {{ user.name }}"
+- name: "Ensure ssh keys for {{ user.name }} are up to date"
   authorized_key:
     user: "{{ user.name }}"
-    key: "{{ key.key }}"
-    state: "{{ 'present' if key.active else 'absent' }}"
-  become: yes
-  loop: "{{ user.ssh }}"
-  loop_control:
-    loop_var: key
+    key: "{{ user.attrs.ssh | join('\n') }}"
+    exclusive: true
+  become: true
+  when: user.attrs.active | default(false)

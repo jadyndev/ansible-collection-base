@@ -1,5 +1,5 @@
-{% for user in users %}
-{% if user.root %}
-{{ user.name }} ALL=(ALL) NOPASSWD:ALL
+{% for name, attrs in users.items() %}
+{% if attrs.root | default(false) and attrs.active | default(false) %}
+{{ name }} ALL=(ALL) NOPASSWD:ALL
 {% endif %}
 {% endfor %}
