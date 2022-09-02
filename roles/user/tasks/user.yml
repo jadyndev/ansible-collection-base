@@ -3,7 +3,7 @@
   user:
     name: "{{ user.name }}"
     shell: "{{ user.attrs.shell | default(omit) }}"
-    groups: "{{ user.attrs.groups | default([]) }}"
+    groups: "{{ user.attrs.groups | default(omit) }}"
     comment: "{{ user.attrs.gecos | default(omit) }}"
     password: "{{ user.attrs.password | default(omit) }}"
     uid: "{{ user.attrs.uid | default(omit) }}"
