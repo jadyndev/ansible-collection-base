@@ -135,6 +135,11 @@ class TestSecretGenerator:
         secret = generator.getSecret()
         assert len(secret) == 30
 
+    def test_missing_user_supplied_secret(self, monkeypatch):
+        generator = gpg_secretstore.SecretGenerator(secret_type="user_supplied")
+        with pytest.raises(Exception):
+            generator.getSecret()
+
     def test_plain_user_supplied_secret(self, monkeypatch):
         generator = gpg_secretstore.SecretGenerator(
             secret_type="user_supplied", user_supplied_secret="secretdata"

@@ -245,6 +245,10 @@ def check_module_import_errors():
     return errors
 
 
+class UserSuppliedSecretMissingError(Exception):
+    pass
+
+
 class SecretGenerator:
     ALLOWED_SECRET_TYPES = ["random", "binary", "user_supplied"]
 
@@ -294,6 +298,10 @@ class SecretGenerator:
 
     @staticmethod
     def __userSuppliedSecret(user_supplied_secret: str, **kwargs):
+        if user_supplied_secret is None:
+            raise UserSuppliedSecretMissingError(
+                "User supplied secret configured, but it's neither in the store nor supplied"
+            )
         return user_supplied_secret
 
 
