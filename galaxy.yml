@@ -12,5 +12,5 @@ license:
 - AGPL-3.0-only
 build_ignore:
 - '*.tar.gz'
-repository: https://gitlab.com/famedly/company/devops/collections/base
-issues: https://gitlab.com/famedly/company/devops/collections/base/-/issues
+repository: https://gitlab.com/famedly/infra/collections/base
+issues: https://gitlab.com/famedly/infra/collections/base/-/issues

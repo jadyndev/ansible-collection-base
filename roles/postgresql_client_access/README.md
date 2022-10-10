@@ -1,6 +1,6 @@
 # `famedly.base.postgresql_client_access` ansible role for configuring users, databases and pg_hba entries of an PostgreSQL instance
 This convenience role creates and updates users, databases and pg_hba entries.
-It's designed to work with PostgreSQL servers running inside a docker container deployed by [famedly.base.postgresql](https://gitlab.com/famedly/company/devops/collections/base/-/tree/main/roles/postgresql).
+It's designed to work with PostgreSQL servers running inside a docker container deployed by [famedly.base.postgresql](https://gitlab.com/famedly/infra/collections/base/-/tree/main/roles/postgresql).
 
 ## Requirements
 - psycopg2
