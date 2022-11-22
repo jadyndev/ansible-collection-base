@@ -34,6 +34,7 @@
 - name: Initialize
   include_tasks: initialize.yml
   when: (not stat_postgresql_data_path.stat.exists) or (find_postgresql_data_path is defined and find_postgresql_data_path.examined == 0)
+  tags: [ 'prepare', 'prepare-postgresql' ]
 
 - name: Template fake /etc/passwd for postgres
   ansible.builtin.template:
