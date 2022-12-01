@@ -6,6 +6,7 @@
     state: present
     system: yes
   register: lego_user_res
+  tags: [prepare, prepare-lego]
 
 - name: Ensure base directory for lego is created
   file:
@@ -14,6 +15,7 @@
     owner: "{{ lego_certificate_store_user }}"
     group: "{{ lego_certificate_store_group }}"
     mode: "0755"
+  tags: [prepare, prepare-lego]
 
 - name: Ensure certificate directory exists and has the configured permissions
   file:
@@ -22,6 +24,7 @@
     owner: "{{ lego_certificate_store_user }}"
     group: "{{ lego_certificate_store_group }}"
     mode: "{{ lego_certificate_store_mode }}"
+  tags: [prepare, prepare-lego]
 
 - name: Ensure lego binary exists and has the correct version
   shell: "{{ lego_check_version_cmd }}"
@@ -29,6 +32,7 @@
   changed_when: false
   ignore_errors: yes
   register: lego_version_res
+  tags: [prepare, prepare-lego]
 
 - name: Install lego from github releases
   block:
@@ -40,6 +44,7 @@
         url_username: "{{ lego_source_url_http_username | default(omit, true) }}"
         url_password: "{{ lego_source_url_http_password | default(omit, true) }}"
         force_basic_auth: "{{ lego_source_url_http_username | default(false, true) | bool }}"
+      tags: [prepare, prepare-lego]
 
     - name: Unpack source files
       unarchive:
@@ -48,6 +53,7 @@
         owner: "{{ lego_user_res.uid }}"
         group: "{{ lego_user_res.group }}"
         remote_src: True
+      tags: [prepare, prepare-lego]
 
     - name: Allow lego to bind to ports below 1024
       capabilities:
@@ -55,11 +61,13 @@
         capability: cap_net_bind_service=+ep
         state: present
       when: lego_cap_net_bind_service
+      tags: [prepare, prepare-lego]
 
     - name: Delete source files
       file:
         path: "{{ lego_base_path }}/source.tar"
         state: absent
+      tags: [prepare, prepare-lego]
   when: 'lego_version_res.failed or not lego_version in lego_version_res.stdout'
 
 - name: Create acme account
@@ -71,6 +79,7 @@
         mode: "0700"
         owner: "{{ lego_user_res.uid }}"
         group: "{{ lego_user_res.group }}"
+      tags: [prepare, prepare-lego]
 
     - name: Create key directory
       file:
@@ -79,6 +88,7 @@
         mode: "0700"
         owner: "{{ lego_user_res.uid }}"
         group: "{{ lego_user_res.group }}"
+      tags: [prepare, prepare-lego]
 
     - name: Save acme account
       copy:
@@ -86,6 +96,7 @@
         content: "{{ lego_acme_account_merged | to_json }}"
       notify:
         - Run lego
+      tags: [deploy, deploy-lego]
 
     - name: Save acme private key
       copy:
@@ -93,6 +104,7 @@
         content: "{{ lego_acme_privkey }}"
       notify:
         - Run lego
+      tags: [deploy, deploy-lego]
 
   when: lego_acme_account is defined and lego_acme_privkey is defined
 
@@ -105,12 +117,14 @@
       changed_when: not lego_certificate_stat.stat.exists
       notify:
         - Run lego
+      tags: [deploy, deploy-lego]
 
     - name: Fetch certificate info
       community.crypto.x509_certificate_info:
         path: "{{ lego_certificate_store }}/{{ lego_certificate.domains[0] }}.crt"
       when: lego_certificate_stat.stat.exists
       register: lego_certificate_info
+      tags: [deploy, deploy-lego]
 
     # you have to seperatly loop because map with regex_replace does not like getting AnsibleUnsafeText objects
     - name: remove DNS at the start of the SAN
@@ -118,6 +132,7 @@
         lego_certificate_sans: "{{ lego_certificate_sans | default([]) + [ item | regex_replace('^DNS:', '') ] }}"
       loop: "{{ lego_certificate_info.subject_alt_name }}"
       when: lego_certificate_stat.stat.exists
+      tags: [deploy, deploy-lego]
 
     - name: Compare SANs, notify handler if they differ
       ansible.builtin.set_fact:
@@ -130,6 +145,7 @@
       changed_when: not lego_certificate_sans_equal
       notify:
         - Run lego
+      tags: [deploy, deploy-lego]
 
     - name: Compare pubkey type, notify handler if it differs
       ansible.builtin.set_fact:
@@ -144,6 +160,7 @@
       changed_when: lego_certificate_pubkey_type_differs
       notify:
         - Run lego
+      tags: [deploy, deploy-lego]
 
 - name: Ensure systemd unit file for lego is templated
   template:
@@ -154,6 +171,7 @@
     mode: '0755'
   notify:
     - Reload systemd
+  tags: [deploy, deploy-lego]
 
 - name: Ensure systemd timer for lego is templated
   template:
@@ -164,6 +182,7 @@
     mode: '0755'
   notify:
     - Reload systemd
+  tags: [deploy, deploy-lego]
 
 - name: Flush handlers to ensure systemd has loaded the unit files
   meta: flush_handlers
@@ -172,15 +191,18 @@
   systemd:
     name: "lego.service"
     enabled: yes
+  tags: [deploy, deploy-lego]
 
 - name: Enable lego.timer
   systemd:
     name: "lego.timer"
     enabled: yes
   register: res_lego_timer
+  tags: [deploy, deploy-lego]
 
 - name: Start lego.timer
   systemd:
     name: "lego.timer"
     state: started
   when: res_lego_timer.changed
+  tags: [deploy, deploy-lego]
