@@ -37,15 +37,15 @@
     env:
       POSTGRES_PASSWORD: "{{ postgresql_superuser_password }}"
   register: postgresql_container
-  tags: [ 'prepare', 'prepare-postgresql' ]
+  tags: [ 'deploy', 'deploy-postgresql' ]
 
 - name: Wait for container to be initialized
   wait_for:
     path: "{{ postgresql_socket_path }}/.s.PGSQL.5432"
-  tags: [ 'prepare', 'prepare-postgresql' ]
+  tags: [ 'deploy', 'deploy-postgresql' ]
 
 - name: Stop initialized container
   community.docker.docker_container:
     name: "{{ postgresql_container_name }}"
     state: absent
-  tags: [ 'prepare', 'prepare-postgresql' ]
+  tags: [ 'deploy', 'deploy-postgresql' ]
