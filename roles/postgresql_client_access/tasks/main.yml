@@ -49,3 +49,6 @@
   loop: "{{ postgresql_client_access_hba_entries }}"
   notify: postgresql_container_restart
   tags: [ 'deploy', 'deploy-postgresql-client-access' ]
+
+- name: Flush handlers to ensure pg_hba updates are propagated in time
+  ansible.builtin.meta: flush_handlers
