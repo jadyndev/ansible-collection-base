@@ -2,8 +2,24 @@
 Description=Timer for lego
 
 [Timer]
+{% if lego_timer_on_boot | bool %}
 OnBootSec={{ lego_timer_on_boot }}
+{% endif %}
+{% if lego_timer_on_calendar %}
 OnCalendar={{ lego_timer_on_calendar }}
+{% else %}
+OnActiveSec={{ lego_timer_interval }}
+{% endif %}
+{% if lego_timer_accuracy %}
+AccuraySec={{ lego_timer_accuracy }}
+{% endif %}
+{% if lego_timer_random_delay %}
+RandomizedDelaySec={{ lego_timer_random_delay }}
+{% endif %}
+{% if lego_timer_persistent %}
+Persistent={{ lego_timer_persistent | string }}
+{% endif %}
+
 Unit=lego.service
 
 [Install]

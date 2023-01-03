@@ -21,8 +21,12 @@ lego_source_url_http_password: ~
 lego_check_version_cmd: "test -e {{ lego_executable }} && {{ lego_executable }} --version"
 
 lego_user: lego
-lego_timer_on_boot: "5min"
-lego_timer_on_calendar: "*:0/15"
+lego_timer_on_boot: ~
+lego_timer_on_calendar: "*-*-* 00,12:00:00"
+lego_timer_interval: ~
+lego_timer_accuracy: ~
+lego_timer_random_delay: 43200
+lego_timer_persistent: true
 
 lego_certificate: ~
 lego_letsencrypt_environment: staging
