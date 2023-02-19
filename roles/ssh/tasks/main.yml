@@ -87,6 +87,7 @@
     regexp: "^#?KexAlgorithms"
     line: "KexAlgorithms {{ ssh_preset.allowed_kexalgos | join(',') }}"
     insertafter: *cipher_after
+  when: "ssh_preset.allowed_kexalgos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -96,6 +97,7 @@
     regexp: "^#?Ciphers"
     line: "Ciphers {{ ssh_preset.allowed_ciphers | join(',') }}"
     insertafter: *cipher_after
+  when: "ssh_preset.allowed_cipers is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -105,6 +107,7 @@
     regexp: "^#?MACs"
     line: "MACs {{ ssh_preset.allowed_macs | join(',') }}"
     insertafter: *cipher_after
+  when: "ssh_preset.allowed_macs is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -114,6 +117,7 @@
     regexp: "^#?HostKeyAlgorithms"
     line: "HostKeyAlgorithms {{ ssh_preset.allowed_hostkey_algos | join(',') }}"
     insertafter: *cipher_after
+  when: "ssh_preset.allowed_hostkey_algos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
@@ -123,6 +127,7 @@
     regexp: "^#?PubkeyAcceptedKeyTypes"
     line: "PubkeyAcceptedKeyTypes {{ ssh_preset.allowed_pubkey_algos | join(',') }}"
     insertafter: *cipher_after
+  when: "ssh_preset.allowed_pubkey_algos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
