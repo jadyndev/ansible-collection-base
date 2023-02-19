@@ -1,5 +1,14 @@
 ---
-- name: "reload sshd"
+- name: "Reload sshd using systemd"
   ansible.builtin.systemd:
     name: "sshd"
     state: "reloaded"
+  when: "ansible_service_mgr == 'systemd'"
+  listen: "reload sshd"
+
+- name: "Reload sshd using runit"
+  community.general.runit:
+    name: "sshd"
+    state: "reloaded"
+  when: "ansible_service_mgr == 'runit'"
+  listen: "reload sshd"
