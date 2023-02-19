@@ -1,10 +1,9 @@
 ---
-
 ssh_config_file: "/etc/ssh/sshd_config"
 
 ssh_preset: "{{ ssh_bsi_recommended_presets }}"
-ssh_loglevel: VERBOSE
-ssh_address_family: any
+ssh_loglevel: "VERBOSE"
+ssh_address_family: "any"
 
 sshd_config_password_authentication: false
 sshd_config_challenge_response_authentication: false
