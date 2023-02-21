@@ -1,29 +1,28 @@
 ---
-
-- name: Create directories for PostgreSQL
+- name: "Create directories for PostgreSQL"
   file:
     path: "{{ item }}"
-    state: directory
+    state: "directory"
     owner: "{{ postgresql_user_res.uid }}"
     group: "{{ postgresql_user_res.group }}"
-    mode: 0755
+    mode: "0755"
   loop:
     - "{{ postgresql_base_path }}"
     - "{{ postgresql_data_path }}"
     - "{{ postgresql_socket_path }}"
     - "{{ postgresql_config_path }}"
-  tags: [ 'prepare', 'prepare-postgresql' ]
+  tags: ["prepare", "prepare-postgresql"]
 
-- name: Template fake /etc/passwd for postgres
+- name: "Template fake /etc/passwd for postgres"
   ansible.builtin.template:
-    src: postgresql-passwd.j2
+    src: "postgresql-passwd.j2"
     dest: "{{ postgresql_config_path }}/postgresql-passwd"
     owner: "{{ postgresql_user_res.uid }}"
     group: "{{ postgresql_user_res.group }}"
-    mode: 0640
-  tags: [ 'prepare', 'prepare-postgresql' ]
+    mode: "0640"
+  tags: ["prepare", "prepare-postgresql"]
 
-- name: Initialize PostgreSQL container
+- name: "Initialize PostgreSQL container"
   community.docker.docker_container:
     name: "{{ postgresql_container_name }}"
     image: "{{ postgresql_container_image }}"
@@ -33,19 +32,19 @@
     networks: "{{ postgresql_container_networks }}"
     etc_hosts: "{{ postgresql_container_etc_hosts }}"
     user: "{{ postgresql_user_res.uid }}:{{ postgresql_user_res.group }}"
-    state: started
+    state: "started"
     env:
       POSTGRES_PASSWORD: "{{ postgresql_superuser_password }}"
-  register: postgresql_container
-  tags: [ 'deploy', 'deploy-postgresql' ]
+  register: "postgresql_container"
+  tags: ["deploy", "deploy-postgresql"]
 
-- name: Wait for container to be initialized
+- name: "Wait for container to be initialized"
   wait_for:
     path: "{{ postgresql_socket_path }}/.s.PGSQL.5432"
-  tags: [ 'deploy', 'deploy-postgresql' ]
+  tags: ["deploy", "deploy-postgresql"]
 
-- name: Stop initialized container
+- name: "Stop initialized container"
   community.docker.docker_container:
     name: "{{ postgresql_container_name }}"
-    state: absent
-  tags: [ 'deploy', 'deploy-postgresql' ]
+    state: "absent"
+  tags: ["deploy", "deploy-postgresql"]

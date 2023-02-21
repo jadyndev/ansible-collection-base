@@ -2,9 +2,13 @@
 postgresql_connection:
   login_host: >-
     {{
-      postgresql_socket_path if postgresql_connect_socket
-      else (postgresql_container.container.NetworkSettings.IPAddress if postgresql_host_port is undefined
-      else "127.0.0.1")
+      postgresql_socket_path
+      if postgresql_connect_socket
+      else (
+        postgresql_container.container.NetworkSettings.IPAddress
+        if postgresql_host_port is undefined
+        else "127.0.0.1"
+      )
     }}
   login_port: >-
     {{
@@ -13,8 +17,8 @@ postgresql_connection:
     }}
   login_password: "{{ postgresql_superuser_password }}"
 
-postgresql_container_data_dir: /var/lib/postgresql/data
-postgresql_container_socket_dir: /var/run/postgresql
+postgresql_container_data_dir: "/var/lib/postgresql/data"
+postgresql_container_socket_dir: "/var/run/postgresql"
 
 postgresql_container_volumes_base:
   - "{{ postgresql_data_path }}:{{ postgresql_container_data_dir }}:z"
@@ -34,4 +38,5 @@ postgresql_container_init_volumes:
 
 postgresql_container_labels_base:
   version: "{{ postgresql_container_version }}"
-postgresql_container_labels_complete: "{{ postgresql_container_labels_base | combine(postgresql_container_labels) }}"
+postgresql_container_labels_complete: >-
+  {{ postgresql_container_labels_base | combine(postgresql_container_labels) }}

@@ -1,6 +1,6 @@
 ---
-postgresql_user: postgresql
-postgresql_base_path: /opt/postgresql
+postgresql_user: "postgresql"
+postgresql_base_path: "/opt/postgresql"
 postgresql_data_path: "{{ postgresql_base_path }}/data"
 postgresql_socket_path: "{{ postgresql_base_path }}/sockets"
 postgresql_config_path: "{{ postgresql_base_path }}/config"
@@ -8,10 +8,16 @@ postgresql_connect_socket: true
 
 postgresql_container_image_name: "docker.io/postgres"
 postgresql_container_version: "13.4"
-postgresql_container_distro: alpine
-postgresql_container_image_tag: "{{ postgresql_container_version }}{{ '-' + postgresql_container_distro if postgresql_container_distro else '' }}"
-postgresql_container_image: "{{ postgresql_container_image_name }}:{{ postgresql_container_image_tag }}"
-postgresql_container_name: postgresql
+postgresql_container_distro: "alpine"
+postgresql_container_image_tag: >-
+  {{
+    postgresql_container_version
+  }}{{
+    ('-' + postgresql_container_distro) if postgresql_container_distro else ''
+  }}
+postgresql_container_image: >-
+  {{ postgresql_container_image_name }}:{{ postgresql_container_image_tag }}
+postgresql_container_name: "postgresql"
 postgresql_container_labels: {}
 postgresql_container_ports: >-
   {{
@@ -25,7 +31,13 @@ postgresql_container_recreate: false
 
 postgresql_container_fd_soft_limit: "8192"
 postgresql_container_fd_hard_limit: "8192"
-postgresql_container_ulimits: ["nofile:{{ postgresql_container_fd_soft_limit }}:{{ postgresql_container_fd_hard_limit }}"]
+postgresql_container_ulimits:
+  - >-
+    nofile:{{
+      postgresql_container_fd_soft_limit
+    }}:{{
+      postgresql_container_fd_hard_limit
+    }}
 postgresql_container_memory_reservation: "256M"
 postgresql_container_memory: "512M"
 postgresql_container_shm_size: "128M"
