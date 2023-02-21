@@ -11,7 +11,7 @@ to build services on.
 
 ## Roles
 
-- [`roles/dropbear-luks-unlock`](roles/dropbear-luks-unlock/README.md) for setting up dropbear to unlock LUKS volumes using a SSH connection at boot
+- [`roles/dropbear_luks_unlock`](roles/dropbear_luks_unlock/README.md) for setting up dropbear to unlock LUKS volumes using a SSH connection at boot
 - [`roles/hostname`](roles/hostname/README.md) for setting `/etc/hostname` and `/etc/hosts`
 - [`roles/ldap`](roles/ldap/README.md) to deploy openldap in a docker container
 - [`roles/redis`](roles/redis/README.md) to deploy redis in a docker container
