@@ -1,8 +1,7 @@
 ---
-
-- name: Restart PostgreSQL docker container
+- name: "Restart PostgreSQL docker container"
   community.docker.docker_container:
-    name: postgresql
-    state: started
+    name: "postgresql"
+    state: "started"
     restart: true
-  listen: postgresql_container_restart
+  listen: "postgresql_container_restart"

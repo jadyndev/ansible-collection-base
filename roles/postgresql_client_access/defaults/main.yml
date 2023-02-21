@@ -1,7 +1,7 @@
 ---
-postgresql_base_path: /opt/postgresql
+postgresql_base_path: "/opt/postgresql"
 postgresql_socket_path: "{{ postgresql_base_path }}/sockets"
 postgresql_config_path: "{{ postgresql_base_path }}/config"
 postgresql_connect_socket: true
 
-postgresql_container_name: postgresql
+postgresql_container_name: "postgresql"

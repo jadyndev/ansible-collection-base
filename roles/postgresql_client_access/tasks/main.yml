@@ -1,12 +1,11 @@
 ---
-
-- name: Get PostgreSQL container info
+- name: "Get PostgreSQL container info"
   community.docker.docker_container_info:
     name: "{{ postgresql_container_name }}"
-  register: postgresql_container
-  tags: [ 'deploy', 'deploy-postgresql-client-access' ]
+  register: "postgresql_container"
+  tags: ["deploy", "deploy-postgresql-client-access"]
 
-- name: Create user
+- name: "Create user"
   community.postgresql.postgresql_user:
     name: "{{ item.name }}"
     password: "{{ item.password }}"
@@ -17,9 +16,9 @@
   loop: "{{ postgresql_client_access_users }}"
   loop_control:
     label: "{{ item.name }}"
-  tags: [ 'deploy', 'deploy-postgresql-client-access' ]
+  tags: ["deploy", "deploy-postgresql-client-access"]
 
-- name: Create database
+- name: "Create database"
   community.postgresql.postgresql_db:
     name: "{{ item.name }}"
     owner: "{{ item.owner | default(omit) }}"
@@ -33,9 +32,9 @@
   loop: "{{ postgresql_client_access_databases }}"
   loop_control:
     label: "{{ item.name }}"
-  tags: [ 'deploy', 'deploy-postgresql-client-access' ]
+  tags: ["deploy", "deploy-postgresql-client-access"]
 
-- name: Update pg_hba.conf
+- name: "Update pg_hba.conf"
   community.postgresql.postgresql_pg_hba:
     dest: "{{ postgresql_config_path }}/pg_hba.conf"
     contype: "{{ item.contype }}"
@@ -47,8 +46,8 @@
     netmask: "{{ item.netmask | default(omit) }}"
     state: "{{ item.state | default(omit) }}"
   loop: "{{ postgresql_client_access_hba_entries }}"
-  notify: postgresql_container_restart
-  tags: [ 'deploy', 'deploy-postgresql-client-access' ]
+  notify: "postgresql_container_restart"
+  tags: ["deploy", "deploy-postgresql-client-access"]
 
-- name: Flush handlers to ensure pg_hba updates are propagated in time
-  ansible.builtin.meta: flush_handlers
+- name: "Flush handlers to ensure pg_hba updates are propagated in time"
+  ansible.builtin.meta: "flush_handlers"
