@@ -18,4 +18,4 @@
     key: "{{ user.attrs.ssh | join('\n') }}"
     exclusive: true
   become: true
-  when: user.attrs.active | default(false)
+  when: "user.attrs.active | default(false)"

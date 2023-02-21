@@ -1,24 +1,24 @@
 ---
-- name: Ensure sudo is installed
+- name: "Ensure sudo is installed"
   package:
-    name: sudo
-    state: present
-  register: task_result
-  until: task_result is success
+    name: "sudo"
+    state: "present"
+  register: "task_result"
+  until: "task_result is success"
   retries: 3
   delay: 2
 
-- name: Loop over users and include per-user tasks
-  include_tasks: user.yml
+- name: "Loop over users and include per-user tasks"
+  include_tasks: "user.yml"
   loop: "{{ users | dict2items(key_name='name', value_name='attrs') }}"
   loop_control:
-    loop_var: user
+    loop_var: "user"
 
-- name: Template sudoers.d managed file
+- name: "Template sudoers.d managed file"
   template:
     src: "sudoers.j2"
     dest: "/etc/sudoers.d/{{ users_sudo_namespace }}"
-    owner: root
-    mode: 0440
+    owner: "root"
+    mode: "0440"
     validate: "/usr/sbin/visudo -cf %s"
   become: true
