@@ -1,13 +1,13 @@
 ---
-- name: Run lego
-  become: yes
+- name: "Run lego"
+  become: true
   become_user: "{{ lego_user_res.name }}"
   environment: "{{ lego_configuration_merged.environment }}"
   command: "{{ lego_command_playbook }}"
   async: 900
   poll: 0
-  register: lego_run
+  register: "lego_run"
 
-- name: Reload systemd
+- name: "Reload systemd"
   systemd:
-    daemon_reload: yes
+    daemon_reload: true
