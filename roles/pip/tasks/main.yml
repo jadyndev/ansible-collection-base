@@ -1,10 +1,10 @@
 ---
-- name: Ensure Pip is installed.
+- name: "Ensure Pip is installed."
   package:
     name: "{{ pip_package_name }}"
-    state: present
+    state: "present"
 
-- name: Install packages from list
+- name: "Install packages from list"
   pip:
     name: "{{ item.name | default(item) }}"
     version: "{{ item.version | default(omit) }}"
@@ -15,7 +15,7 @@
   loop: "{{ pip_packages }}"
   environment: "{{ pip_environment_variables }}"
 
-- name: Install packages from requirements file
+- name: "Install packages from requirements file"
   pip:
     requirements: "{{ pip_requirements_file }}"
     virtualenv: "{{ pip_package_virtualenv | default(omit) }}"
