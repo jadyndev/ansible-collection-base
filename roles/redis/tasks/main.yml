@@ -1,60 +1,62 @@
 ---
-
-- name: Create redis user
+- name: "Create redis user"
   user:
     name: "{{ redis_user }}"
-    create_home: no
-    state: present
-  register: redis_user_res
-  tags: ['prepare', 'prepare-redis',
-         'deploy', 'deploy-redis']
+    create_home: false
+    state: "present"
+  register: "redis_user_res"
+  tags: ["prepare", "prepare-redis", "deploy", "deploy-redis"]
 
-- name: Create redis directory
+- name: "Create redis directory"
   file:
     path: "{{ redis_basepath }}"
-    state: directory
+    state: "directory"
     owner: "{{ redis_user }}"
     group: "{{ redis_user }}"
-  tags: ['prepare', 'prepare-redis']
+    mode: "0755"
+  tags: ["prepare", "prepare-redis"]
 
-- name: Create redis directory for data persistance
+- name: "Create redis directory for data persistance"
   file:
     path: "{{ redis_data_dir }}"
-    state: directory
+    state: "directory"
     owner: "{{ redis_user }}"
     group: "{{ redis_user }}"
-  tags: ['prepare', 'prepare-redis']
+    mode: "0755"
+  tags: ["prepare", "prepare-redis"]
 
-- name: Create redis config directory
+- name: "Create redis config directory"
   file:
     path: "{{ redis_config_dir }}"
-    state: directory
+    state: "directory"
     owner: "{{ redis_user }}"
     group: "{{ redis_user }}"
-  tags: ['prepare', 'prepare-redis']
+    mode: "0755"
+  tags: ["prepare", "prepare-redis"]
 
-- name: Template redis config file
+- name: "Template redis config file"
   template:
-    src: redis.conf.j2
+    src: "redis.conf.j2"
     dest: "{{ redis_config_file }}"
     owner: "{{ redis_user }}"
     group: "{{ redis_user }}"
-  notify: restart-redis
-  tags: ['deploy', 'deploy-redis']
+    mode: "0600"
+  notify: "restart-redis"
+  tags: ["deploy", "deploy-redis"]
 
-- name: Ensure redis container image is present
-  docker_image:
+- name: "Ensure redis container image is present"
+  community.docker.docker_image:
     name: "{{ redis_docker_image }}"
-    force_source: "{{ redis_docker_image_force_pull|default(False) }}"
-    source: pull
-    state: present
-  tags: ['prepare', 'prepare-redis']
+    force_source: "{{ redis_docker_image_force_pull | default(False) }}"
+    source: "pull"
+    state: "present"
+  tags: ["prepare", "prepare-redis"]
 
-- name: Setup redis docker container
-  docker_container:
+- name: "Setup redis docker container"
+  community.docker.docker_container:
     image: "{{ redis_docker_image }}"
     name: "{{ redis_docker_container_name }}"
-    restart_policy: unless-stopped
+    restart_policy: "unless-stopped"
     user: "{{ redis_user_res.uid }}:{{ redis_user_res.group }}"
     ports: "{{ redis_docker_ports }}"
     volumes: "{{ redis_docker_volumes }}"
@@ -62,11 +64,11 @@
     networks: "{{ redis_docker_networks | default(omit, True) }}"
     purge_networks: "{{ redis_docker_purge_networks }}"
     entrypoint: "redis-server"
-    command: [ "{{ redis_docker_configpath }}" ]
+    command: ["{{ redis_docker_configpath }}"]
     healthcheck:
       test: >-
         redis-cli -a {{ redis_secret }} PING || exit 1
-  tags: ['deploy', 'deploy-redis']
+  tags: ["deploy", "deploy-redis"]
 
-- name: Ensure redis is restarted if config changed
-  meta: flush_handlers
+- name: "Ensure redis is restarted if config changed"
+  meta: "flush_handlers"
