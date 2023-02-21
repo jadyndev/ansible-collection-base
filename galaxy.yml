@@ -1,16 +1,18 @@
-namespace: famedly
-name: base
-version: 0.2.0
-readme: README.md
+---
+namespace: "famedly"
+name: "base"
+version: "0.2.0"
+readme: "README.md"
 authors:
-- Jadyn Emma Jäger <jadyn@jadyn.dev>
-- Jan Christian Grünhage <jan.christian@gruenhage.xyz>
-- Johanna Dorothea Reichmann <transcaffeine@finallycoffee.eu>
-- Vincent Wilke <v.wilke@famedly.com>
-description: Common functionality needed on hosts to build complex services on.
-license:
-- AGPL-3.0-only
-build_ignore:
-- '*.tar.gz'
-repository: https://gitlab.com/famedly/infra/collections/base
-issues: https://gitlab.com/famedly/infra/collections/base/-/issues
+  - "Evelyn Alicke <e.alicke@famedly.com>"
+  - "Jadyn Emma Jäger <jadyn@jadyn.dev>"
+  - "Jan Christian Grünhage <jan.christian@gruenhage.xyz>"
+  - "Johanna Dorothea Reichmann <transcaffeine@finallycoffee.eu>"
+  - "Lars Kaiser <l.kaiser@famedly.com>"
+  - "Lukas Lihotzki <l.lihotzki@famedly.com>"
+  - "Vincent Wilke"
+description: "Common functionality needed on hosts to build complex services on."
+license: ["AGPL-3.0-only"]
+build_ignore: ["*.tar.gz"]
+repository: "https://gitlab.com/famedly/infra/collections/base"
+issues: "https://gitlab.com/famedly/infra/collections/base/-/issues"
