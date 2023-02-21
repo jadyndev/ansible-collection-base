@@ -1,36 +1,35 @@
 ---
-
-- name: Ensure base path exists
+- name: "Ensure base path exists"
   file:
     path: "{{ ldap_base_path }}"
-    state: directory
-    mode: 0700
-  tags: [ 'prepare', 'prepare-ldap' ]
+    state: "directory"
+    mode: "0755"
+  tags: ["prepare", "prepare-ldap"]
 
-- name: Create volume paths
+- name: "Create volume paths"
   file:
     path: "{{ item }}"
-    state: directory
-    mode: 0700
+    state: "directory"
+    mode: "0755"
   loop:
     - "{{ ldap_data_path }}"
     - "{{ ldap_config_path }}"
     - "{{ ldap_base_path }}/sock"
-  tags: [ 'prepare', 'prepare-ldap' ]
+  tags: ["prepare", "prepare-ldap"]
 
-- name: Provide intial container configuration
-  import_tasks: initialize.yml
+- name: "Provide intial container configuration"
+  import_tasks: "initialize.yml"
 
-- name: Ensure LDAP container image is pulled
-  docker_image:
+- name: "Ensure LDAP container image is pulled"
+  community.docker.docker_image:
     name: "{{ ldap_container_image }}"
     force_source: "{{ ldap_container_pull }}"
-    source: pull
-    state: present
-  tags: [ 'prepare', 'prepare-ldap' ]
+    source: "pull"
+    state: "present"
+  tags: ["prepare", "prepare-ldap"]
 
-- name: Ensure LDAP container is started
-  docker_container:
+- name: "Ensure LDAP container is started"
+  community.docker.docker_container:
     name: "{{ ldap_container_name }}"
     image: "{{ ldap_container_image }}"
     ports: "{{ ldap_container_ports }}"
@@ -42,18 +41,18 @@
     memory_reservation: "{{ ldap_container_memory_reservation }}"
     memory: "{{ ldap_container_memory }}"
     recreate: "{{ ldap_container_recreate }}"
-    restart_policy: unless-stopped
+    restart_policy: "unless-stopped"
     command: "{{ ldap_container_command | default(omit) }}"
-    state: started
+    state: "started"
     healthcheck:
       test: >-
         [[ $(netstat -plnte | grep slapd | wc -l) -ge 1 ]]
         && [[ $(ps aux | grep slapd | wc -l) -ge 1 ]]
         || exit 1
-  tags: [ 'deploy', 'deploy-ldap' ]
+  tags: ["deploy", "deploy-ldap"]
 
-- name: Configure LDAP DIT
-  import_tasks: configure.yml
+- name: "Configure LDAP DIT"
+  import_tasks: "configure.yml"
 
-- name: Set up phpLDAPAdmin container
-  import_tasks: ldap-web-ui.yml
+- name: "Set up phpLDAPAdmin container"
+  import_tasks: "ldap-web-ui.yml"
