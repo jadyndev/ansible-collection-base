@@ -3,7 +3,12 @@
   user:
     name: "{{ user.name }}"
     shell: "{{ user.attrs.shell | default(omit) }}"
-    groups: "{{ ansible_facts.getent_group | intersect(user.attrs.groups | default([])) }}"
+    groups: >-
+      {{
+        omit
+        if user.attrs.groups is not sequence
+        else ansible_facts.getent_group | intersect(user.attrs.groups)
+      }}
     append: "{{ user.attrs.append | default(omit) }}"
     comment: "{{ user.attrs.gecos | default(omit) }}"
     password: "{{ user.attrs.password | default(omit) }}"
