@@ -8,6 +8,10 @@
   retries: 3
   delay: 2
 
+- name: "Query groups available on server"
+  ansible.builtin.getent:
+    database: "group"
+
 - name: "Loop over users and include per-user tasks"
   include_tasks: "user.yml"
   loop: "{{ users | dict2items(key_name='name', value_name='attrs') }}"
