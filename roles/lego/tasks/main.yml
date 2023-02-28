@@ -96,6 +96,8 @@
         dest: "{{ lego_acme_account_path }}"
         content: "{{ lego_acme_account_merged | to_json }}"
         mode: "0600"
+        owner: "{{ lego_user_res.uid }}"
+        group: "{{ lego_user_res.group }}"
       tags: ["deploy", "deploy-lego"]
 
     - name: "Save acme private key"
@@ -103,6 +105,8 @@
         dest: "{{ lego_acme_key_path }}"
         content: "{{ lego_acme_privkey }}"
         mode: "0600"
+        owner: "{{ lego_user_res.uid }}"
+        group: "{{ lego_user_res.group }}"
       tags: ["deploy", "deploy-lego"]
 
 - name: "Check if certificate is nonexistent or differs from wanted state"
