@@ -39,7 +39,7 @@ lego_command_playbook_parameters: >-2
   {%- endfor -%}
 
 lego_command_playbook: >-2
-  {{ lego_command_global_merged }}{{ lego_tasks.playbook }}{{ lego_command_playbook_parameters }}
+  {{ lego_command_global_merged }} {{ lego_tasks.playbook }}{{ lego_command_playbook_parameters }}
 
 lego_command_systemd_parameters: >-2
   {% for parameter in lego_configuration_merged.command_parameters[lego_tasks.systemd] %}
