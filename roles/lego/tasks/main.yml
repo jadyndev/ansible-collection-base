@@ -33,6 +33,16 @@
   register: "lego_version_res"
   tags: ["prepare", "prepare-lego"]
 
+- name: "Ensure lego metrics textfile generator exists"
+  template:
+    src: "metrics-textfile.py.j2"
+    dest: "{{ lego_base_path }}/metrics-textfile.py"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  when: "lego_enable_metrics_textfile"
+  tags: ["prepare", "prepare-lego"]
+
 - name: "Install lego from github releases"
   when: "lego_version_res.failed or not lego_version in lego_version_res.stdout"
   block:

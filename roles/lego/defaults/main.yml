@@ -12,6 +12,8 @@ lego_executable: "{{ lego_base_path }}/lego"
 lego_account_base_path: "{{ lego_base_path }}/accounts"
 lego_cap_net_bind_service: true
 
+lego_enable_metrics_textfile: false
+
 lego_source_server_domain: "github.com"
 lego_source_url: >-2
   https://{{
