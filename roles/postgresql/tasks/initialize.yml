@@ -25,7 +25,7 @@
 - name: "Initialize PostgreSQL container"
   community.docker.docker_container:
     name: "{{ postgresql_container_name }}"
-    image: "{{ postgresql_container_image }}"
+    image: "{{ postgresql_container_image_reference }}"
     ports: "{{ postgresql_container_ports }}"
     volumes: "{{ postgresql_container_init_volumes }}"
     labels: "{{ postgresql_container_labels_complete }}"

@@ -34,11 +34,11 @@ This is an example for specifying the official PostGIS image:
 ```yaml
 postgresql_version: "13"
 postgis_version: "3.1"
-postgresql_container_image_name: "docker.io/postgis/postgis"
+postgresql_container_image_repository: "docker.io/postgis/postgis"
 postgresql_container_image_tag: "{{ postgresql_version }}-{{ postgis_version }}-{{ postgresql_container_distro }}"
 ```
 
-You could also override the entire `postgresql_container_image` variable.
+You could also override the entire `postgresql_container_image_reference` variable.
 
 ## Dependencies
 Docker needs to be installed and configured.

@@ -6,17 +6,34 @@ postgresql_socket_path: "{{ postgresql_base_path }}/sockets"
 postgresql_config_path: "{{ postgresql_base_path }}/config"
 postgresql_connect_socket: true
 
-postgresql_container_image_name: "docker.io/postgres"
 postgresql_container_version: "13.4"
 postgresql_container_distro: "alpine"
-postgresql_container_image_tag: >-
+
+postgresql_container_image_reference: >-
   {{
-    postgresql_container_version
-  }}{{
-    ('-' + postgresql_container_distro) if postgresql_container_distro else ''
+    postgresql_container_image_repository
+    + ':'
+    + postgresql_container_image_tag | default(
+      postgresql_container_version
+      + (('-' + postgresql_container_distro)
+        if postgresql_container_distro
+        else ''
+      )
+    )
   }}
-postgresql_container_image: >-
-  {{ postgresql_container_image_name }}:{{ postgresql_container_image_tag }}
+postgresql_container_image_repository: >-
+  {{
+    (
+      container_registries[postgresql_container_image_registry]
+      | default(postgresql_container_image_registry)
+    )
+    + '/'
+    + postgresql_container_image_namespace | default('')
+    + postgresql_container_image_name
+  }}
+postgresql_container_image_registry: "docker.io"
+postgresql_container_image_name: "postgres"
+
 postgresql_container_name: "postgresql"
 postgresql_container_labels: {}
 postgresql_container_ports: >-

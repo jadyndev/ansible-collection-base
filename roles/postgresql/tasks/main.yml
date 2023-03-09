@@ -9,7 +9,7 @@
 
 - name: "Ensure PostgreSQL container image is pulled"
   community.docker.docker_image:
-    name: "{{ postgresql_container_image }}"
+    name: "{{ postgresql_container_image_reference }}"
     force_source: "{{ postgresql_container_pull }}"
     source: "pull"
     state: "present"
@@ -89,7 +89,7 @@
 - name: "Ensure PostgreSQL container is started"
   community.docker.docker_container:
     name: "{{ postgresql_container_name }}"
-    image: "{{ postgresql_container_image }}"
+    image: "{{ postgresql_container_image_reference }}"
     ports: "{{ postgresql_container_ports }}"
     volumes: "{{ postgresql_container_volumes_complete }}"
     labels: "{{ postgresql_container_labels_complete }}"
