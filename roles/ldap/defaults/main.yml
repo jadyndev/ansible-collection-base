@@ -4,8 +4,28 @@ ldap_sock_path: "{{ ldap_base_path }}/sock"
 ldap_data_path: "{{ ldap_base_path }}/data"
 ldap_config_path: "{{ ldap_base_path }}/config"
 
-ldap_container_version: "v2.6.3-r6"
-ldap_container_image: "registry.gitlab.com/famedly/infra/containers/openldap:{{ ldap_container_version }}"
+ldap_version: "2.6.3-r6"
+
+ldap_container_image_reference: >-
+  {{
+    ldap_container_image_repository
+    + ':'
+    + ldap_container_image_tag | default('v' + ldap_version)
+  }}
+ldap_container_image_repository: >-
+  {{
+    (
+      container_registries[ldap_container_image_registry]
+      | default(ldap_container_image_registry)
+    )
+    + '/'
+    + ldap_container_image_namespace | default('')
+    + ldap_container_image_name
+  }}
+ldap_container_image_registry: "registry.gitlab.com"
+ldap_container_image_namespace: "famedly/infra/containers/"
+ldap_container_image_name: "openldap"
+
 ldap_container_name: "ldap"
 ldap_container_ports: "389:389"
 ldap_server_uri: "ldap:///"
@@ -28,7 +48,27 @@ ldap_init_container_additional_volumes:
 ldap_management_container_enabled: false
 ldap_management_container_name: "ldap_management"
 ldap_management_version: "0.9.0"
-ldap_management_container_image: "docker.io/osixia/phpldapadmin:{{ ldap_management_version }}"
+
+ldap_management_container_image_reference: >-
+  {{
+    ldap_management_container_image_repository
+    + ':'
+    + ldap_management_container_image_tag | default(ldap_management_version)
+  }}
+ldap_management_container_image_repository: >-
+  {{
+    (
+      container_registries[ldap_management_container_image_registry]
+      | default(ldap_management_container_image_registry)
+    )
+    + '/'
+    + ldap_management_container_image_namespace | default('')
+    + ldap_management_container_image_name
+  }}
+ldap_management_container_image_registry: "docker.io"
+ldap_management_container_image_namespace: "osixia/"
+ldap_management_container_image_name: "phpldapadmin"
+
 ldap_management_container_ports: []
 ldap_management_container_env: {}
 ldap_management_container_labels: {}

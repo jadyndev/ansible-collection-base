@@ -18,7 +18,7 @@ ldap_container_volumes_base:
   - "{{ ldap_sock_path }}:{{ ldap_container_socket_dir }}:z"
 
 ldap_container_labels_base:
-  version: "{{ ldap_container_version }}"
+  version: "{{ ldap_version }}"
 ldap_container_labels_complete: "{{ ldap_container_labels_base | combine(ldap_container_labels) }}"
 
 # phpLDAPadmin container labels

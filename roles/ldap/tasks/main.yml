@@ -22,7 +22,7 @@
 
 - name: "Ensure LDAP container image is pulled"
   community.docker.docker_image:
-    name: "{{ ldap_container_image }}"
+    name: "{{ ldap_container_image_reference }}"
     force_source: "{{ ldap_container_pull }}"
     source: "pull"
     state: "present"
@@ -31,7 +31,7 @@
 - name: "Ensure LDAP container is started"
   community.docker.docker_container:
     name: "{{ ldap_container_name }}"
-    image: "{{ ldap_container_image }}"
+    image: "{{ ldap_container_image_reference }}"
     ports: "{{ ldap_container_ports }}"
     volumes: "{{ ldap_container_volumes }}"
     labels: "{{ ldap_container_labels_complete }}"

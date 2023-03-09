@@ -51,7 +51,7 @@
 - name: "(init) Run init script in container"
   community.docker.docker_container:
     name: "{{ ldap_container_name }}"
-    image: "{{ ldap_container_image }}"
+    image: "{{ ldap_container_image_reference }}"
     command: "slapadd -v -F {{ ldap_container_conf_dir }} -n 0 -l {{ ldap_container_slapd_file }}"
     cleanup: true
     detach: false
