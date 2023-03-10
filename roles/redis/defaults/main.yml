@@ -18,8 +18,28 @@ redis_config_max_memory_policy: ~  # allkeys-lru
 redis_prefix: ""
 redis_docker_labels: {}
 redis_docker_configpath: "/usr/local/etc/redis/redis.conf"
-redis_docker_image: "docker.io/library/redis:{{ redis_docker_tag }}"
-redis_docker_tag: "{{ redis_version }}-alpine"
+
+redis_container_image_reference: >-
+  {{
+    redis_container_image_repository
+    + ':'
+    + redis_container_image_tag | default(redis_version + '-alpine')
+  }}
+redis_container_image_repository: >-
+  {{
+    (
+      container_registries[redis_container_image_registry]
+      | default(redis_container_image_registry)
+    )
+    + '/'
+    + redis_container_image_namespace | default('')
+    + redis_container_image_name
+  }}
+redis_container_image_registry: "docker.io"
+redis_container_image_name: "redis"
+
+redis_container_image_force_pull: "{{ redis_container_image_tag is defined }}"
+
 redis_docker_container_name: "{{ redis_prefix }}redis"
 redis_docker_ports: ["6379:6379"]
 redis_docker_networks: ~

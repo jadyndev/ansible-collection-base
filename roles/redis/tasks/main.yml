@@ -46,15 +46,15 @@
 
 - name: "Ensure redis container image is present"
   community.docker.docker_image:
-    name: "{{ redis_docker_image }}"
-    force_source: "{{ redis_docker_image_force_pull | default(False) }}"
+    name: "{{ redis_container_image_reference }}"
+    force_source: "{{ redis_container_image_force_pull }}"
     source: "pull"
     state: "present"
   tags: ["prepare", "prepare-redis"]
 
 - name: "Setup redis docker container"
   community.docker.docker_container:
-    image: "{{ redis_docker_image }}"
+    image: "{{ redis_container_image_reference }}"
     name: "{{ redis_docker_container_name }}"
     restart_policy: "unless-stopped"
     user: "{{ redis_user_res.uid }}:{{ redis_user_res.group }}"
