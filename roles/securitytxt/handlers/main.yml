@@ -1,0 +1,10 @@
+---
+- name: "Deploy nginx for serving security.txt"
+  community.docker.docker_container:
+    name: "{{ securitytxt_container_name }}"
+    image: "{{ securitytxt_container_image_reference }}"
+    volumes:
+      - "/opt/securitytxt/security.txt:/usr/share/nginx/html/.well-known/security.txt:ro"
+    labels: "{{ securitytxt_container_labels }}"
+    recreate: true
+  listen: "recreate-securitytxt-webserver"

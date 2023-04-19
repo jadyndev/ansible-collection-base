@@ -1,0 +1,37 @@
+Expires: {{ '%Y-%m-%dT%H:%M:%Sz' | strftime((securitytxt_expires | to_datetime).timestamp()) }}
+
+{% for contact in securitytxt_contacts %}
+Contact: {{ contact }}
+{% endfor %}
+
+{%- if securitytxt_preferred_languages is defined %}
+
+Preferred-Languages: {{ securitytxt_preferred_languages | join(', ') }}
+{% endif %}
+
+{%- if securitytxt_acknowledgments is defined %}
+
+Acknowledgments: {{ securitytxt_acknowledgments }}
+{% endif %}
+
+{%-  if securitytxt_canonical is defined %}
+
+{% for canonical in securitytxt_canonical %}
+Canonical: {{ canonical }}
+{% endfor %}
+{% endif %}
+
+{%- if securitytxt_encryption is defined %}
+
+Encryption: {{ securitytxt_encryption }}
+{% endif %}
+
+{%- if securitytxt_hiring is defined %}
+
+Hiring: {{ securitytxt_hiring }}
+{% endif %}
+
+{%-  if securitytxt_policy is defined %}
+
+Policy: {{ securitytxt_policy }}
+{% endif %}

@@ -1,0 +1,21 @@
+---
+securitytxt_container_name: "securitytxt"
+
+securitytxt_container_image_reference: >-
+  {{
+    securitytxt_container_image_repository
+    + ':'
+    + securitytxt_container_image_tag | default('1-alpine')
+  }}
+securitytxt_container_image_repository: >-
+  {{
+    (
+      container_registries[securitytxt_container_image_registry]
+      | default(securitytxt_container_image_registry)
+    )
+    + '/'
+    + securitytxt_container_image_namespace | default('')
+    + securitytxt_container_image_name
+  }}
+securitytxt_container_image_registry: "docker.io"
+securitytxt_container_image_name: "nginx"

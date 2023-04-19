@@ -1,0 +1,37 @@
+---
+- name: Check that role variables are configured correctly
+  ansible.builtin.assert:
+    that:
+      - securitytxt_contacts | length >= 1
+      - (securitytxt_expires | to_datetime) > now()
+
+- name: "Create securitytxt webroot"
+  ansible.builtin.file:
+    state: "directory"
+    path: "/opt/securitytxt"
+    mode: "0755"
+  tags: ["prepare", "prepare-securitytxt"]
+
+- name: "Template security.txt"
+  ansible.builtin.template:
+    src: "security.txt.j2"
+    dest: "/opt/securitytxt/security.txt"
+    mode: "0644"
+  notify: "recreate-securitytxt-webserver"
+  tags: ["deploy", "deploy-securitytxt"]
+
+- name: "Ensure nginx container image is present"
+  community.docker.docker_image:
+    name: "{{ securitytxt_container_image_reference }}"
+    source: "pull"
+    state: "present"
+  tags: ["prepare", "prepare-securitytxt"]
+
+- name: "Deploy nginx for serving security.txt"
+  community.docker.docker_container:
+    name: "{{ securitytxt_container_name }}"
+    image: "{{ securitytxt_container_image_reference }}"
+    volumes:
+      - "/opt/securitytxt/security.txt:/usr/share/nginx/html/.well-known/security.txt:ro"
+    labels: "{{ securitytxt_container_labels }}"
+  tags: ["deploy", "deploy-securitytxt"]
