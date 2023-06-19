@@ -114,3 +114,30 @@ lego_acme_account:
   registration:
     uri: "https://acme-v02.api.letsencrypt.org/acme/acct/my-account-id"
 ```
+
+### Dependencies
+
+This role assumes the `cryptography` python package is present on the system. It can be installed in different ways:
+
+- set `lego_install_dependencies: true` which will attempt to install the `python3-cryptography` package on debian
+- use the `famedly.base.pip` role:
+```yaml
+---
+
+- name: Ensure lego is running
+  hosts: [ lego ]
+  become: yes
+  roles:
+    - role: famedly.base.pip
+      vars:
+        pip_packages:
+          - name: cryptography
+    - role: famedly.base.lego
+      vars:
+        lego_challenge:
+          type: http
+        lego_certificate:
+          domains:
+            - my.domain.tld
+          email: acme@domain.tld
+```

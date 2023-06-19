@@ -86,3 +86,11 @@ lego_configuration_defaults:
     renew:
       days: "{{ lego_certificate_renewal_days }}"
   environment: {}
+
+lego_install_dependencies: false
+lego_dependencies:
+  Debian:
+    "11":
+      - "python3-cryptography"
+    all:
+      - "python3-cryptography"
