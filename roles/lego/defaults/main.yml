@@ -72,6 +72,7 @@ lego_acme_account_defaults:
         - "mailto:{{ lego_certificate.email }}"
 
 lego_certificate_renewal_days: 30
+lego_configuration_default_key_type: "ec256"
 
 lego_configuration_defaults:
   command_parameters:
@@ -80,6 +81,7 @@ lego_configuration_defaults:
       accept-tos: true
       email: "{{ lego_certificate.email }}"
       path: "{{ lego_base_path }}"
+      key-type: "{{ lego_configuration_default_key_type }}"
     run: {}
     renew:
       days: "{{ lego_certificate_renewal_days }}"

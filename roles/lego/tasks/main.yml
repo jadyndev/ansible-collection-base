@@ -162,8 +162,8 @@
       vars:
         lego_certificate_wanted_keytype: >-2
           {{
-            "ECC" if "ec" in lego_configuration.command_parameters.global["key-type"]
-            else "RSA" if "rsa" in lego_configuration.command_parameters.global["key-type"]
+            "ECC" if "ec" in lego_configuration_merged.command_parameters.global["key-type"]
+            else "RSA" if "rsa" in lego_configuration_merged.command_parameters.global["key-type"]
           }}
       when: "lego_certificate_stat.stat.exists"
       changed_when: "lego_certificate_pubkey_type_differs"
