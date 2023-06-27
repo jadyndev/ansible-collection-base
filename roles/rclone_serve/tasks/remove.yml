@@ -1,0 +1,16 @@
+---
+
+- name: Ensure container is absent
+  community.docker.docker_container:
+    name: "{{ rclone_serve_container_name }}"
+    state: "absent"
+
+- name: Ensure config directory is absent
+  ansible.builtin.file:
+    path: "{{ rclone_serve_base_path }}"
+    state: "absent"
+
+- name: Ensure user is absent
+  ansible.builtin.user:
+    name: "{{ rclone_serve_user }}"
+    state: "absent"

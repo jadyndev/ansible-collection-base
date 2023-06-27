@@ -1,0 +1,8 @@
+---
+
+- name: Restart rclone-serve container
+  listen: container-rclone-serve-restart
+  community.docker.docker_container:
+    name: "{{ rclone_serve_container_name }}"
+    state: started
+    restart: true

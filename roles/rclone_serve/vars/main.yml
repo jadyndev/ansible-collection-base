@@ -1,0 +1,38 @@
+---
+
+rclone_serve_backends:
+  default: "{{ rclone_serve_backend_config }}"
+
+rclone_serve_flags_base:
+  addr: ":8080"
+  config: "{{ rclone_serve_config_file }}"
+rclone_serve_flags_merged: >-
+  {{
+    rclone_serve_flags_base
+    | combine(rclone_serve_flags)
+  }}
+
+rclone_serve_container_volumes_base:
+  - "{{ rclone_serve_base_path }}:{{ rclone_serve_base_path }}:Z"
+rclone_serve_container_volumes_merged: "{{ rclone_serve_container_volumes_base + rclone_serve_container_volumes }}"
+
+rclone_serve_container_labels_base:
+  version: "{{ rclone_serve_version }}"
+rclone_serve_container_labels_merged: >-
+  {{ rclone_serve_container_labels_base
+  | combine(rclone_serve_container_labels | default({})) }}
+
+# this should NEVER be overwritten. instead, overwrite rclone_serve_flags_merged
+rclone_serve_container_command: >-
+  {% set rclone_flags = [] %}
+    {%- for rclone_flag in rclone_serve_flags_merged | dict2items -%}
+      {%- if not rclone_flag.value -%}
+        {%- do rclone_flags.append('--' ~ rclone_flag.key) -%}
+      {%- elif rclone_flag.value -%}
+        {%- do rclone_flags.append('--' ~ rclone_flag.key ~ ' ' ~ rclone_flag.value) -%}
+      {%- endif -%}
+    {%- endfor -%}
+  serve
+  {{ rclone_serve_protocol }}
+  default:
+  {{ rclone_flags | join(' ') }}

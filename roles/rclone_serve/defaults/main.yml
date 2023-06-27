@@ -1,0 +1,41 @@
+---
+
+rclone_serve_role_action: "install"
+
+rclone_serve_version: "1.64.2"
+rclone_serve_user: "rclone"
+rclone_serve_base_path: "/opt/rclone-serve/"
+
+rclone_serve_protocol: ~
+rclone_serve_backend_config: ~
+rclone_serve_flags: ~
+
+rclone_serve_config_file: "{{ rclone_serve_base_path ~ 'rclone-backend.conf' }}"
+
+rclone_serve_container_name: 'rclone-serve'
+rclone_serve_container_env: {}
+rclone_serve_container_ports: []
+rclone_serve_container_labels: {}
+rclone_serve_container_volumes: []
+rclone_serve_container_restart_policy: "unless-stopped"
+rclone_serve_container_force_pull: false
+
+rclone_serve_container_image_reference: >-
+  {{
+    rclone_serve_container_image_repository
+    + ':'
+    + rclone_serve_container_image_tag | default(rclone_serve_version)
+  }}
+rclone_serve_container_image_repository: >-
+  {{
+    (
+      container_registries[rclone_serve_container_image_registry]
+      | default(rclone_serve_container_image_registry)
+    )
+    + '/'
+    + rclone_serve_container_image_namespace | default('')
+    + rclone_serve_container_image_name
+  }}
+rclone_serve_container_image_registry: "docker.io"
+rclone_serve_container_image_namespace: "rclone/"
+rclone_serve_container_image_name: "rclone"

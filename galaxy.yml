@@ -12,6 +12,8 @@ authors:
   - "Lukas Lihotzki <l.lihotzki@famedly.com>"
   - "Vincent Wilke"
 description: "Common functionality needed on hosts to build complex services on."
+dependencies:
+  "sivel.toiletwater": ">=0.0.15"
 license: ["AGPL-3.0-only"]
 build_ignore: ["*.tar.gz"]
 repository: "https://github.com/famedly/ansible-collection-base"
