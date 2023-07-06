@@ -34,4 +34,5 @@
     volumes:
       - "/opt/securitytxt/security.txt:/usr/share/nginx/html/.well-known/security.txt:ro"
     labels: "{{ securitytxt_container_labels }}"
+    restart_policy: "unless-stopped"
   tags: ["deploy", "deploy-securitytxt"]
