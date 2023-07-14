@@ -3,8 +3,31 @@ dropbear_luks_required_packages:
   - "dropbear-initramfs"
   - "cryptsetup-initramfs"
 
-dropbear_initramfs_config_path: "/etc/dropbear-initramfs/config"
-dropbear_initramfs_authorized_keys_path: "/etc/dropbear-initramfs/authorized_keys"
+dropbear_crypttab_path: "/etc/crypttab"
+dropbear_initramfs_base_paths:
+  Debian:
+    "10":
+      base_path: "/etc/dropbear-initramfs"
+      config_file: "config"
+    "11":
+      base_path: "/etc/dropbear-initramfs"
+      config_file: "config"
+    "12":
+      base_path: "/etc/dropbear/initramfs"
+      config_file: "dropbear.conf"
+  default:
+    base_path: "/etc/dropbear-initramfs"
+    config_file: "config"
+
+dropbear_initramfs_base_path: "{{ (dropbear_initramfs_base_paths[ansible_distribution]
+                                                                [ansible_distribution_major_version | string]
+                                   | default(dropbear_initramfs_base_paths.default)).base_path }}"
+
+dropbear_initramfs_config_file: "{{ (dropbear_initramfs_base_paths[ansible_distribution]
+                                                                  [ansible_distribution_major_version | string]
+                                     | default(dropbear_initramfs_base_paths.default)).config_file }}"
+dropbear_initramfs_config_path: "{{ dropbear_initramfs_base_path }}/{{ dropbear_initramfs_config_file }}"
+dropbear_initramfs_authorized_keys_path: "{{ dropbear_initramfs_base_path }}/authorized_keys"
 initramfs_tools_config_path: "/etc/initramfs-tools/initramfs.conf"
 initramfs_tools_module_config_path: "/etc/initramfs-tools/modules"
 initramfs_modules_to_load:
