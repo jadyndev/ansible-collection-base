@@ -15,6 +15,7 @@
     password_lock: "{{ user.attrs.password_lock | default(omit) }}"
     uid: "{{ user.attrs.uid | default(omit) }}"
     state: "{{ user.attrs.active | default(false) | ternary('present', 'absent') }}"
+    remove: true
   become: true
 
 - name: "Ensure ssh keys for {{ user.name }} are up to date"
