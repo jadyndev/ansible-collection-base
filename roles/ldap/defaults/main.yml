@@ -4,7 +4,7 @@ ldap_sock_path: "{{ ldap_base_path }}/sock"
 ldap_data_path: "{{ ldap_base_path }}/data"
 ldap_config_path: "{{ ldap_base_path }}/config"
 
-ldap_version: "2.6.3-r6"
+ldap_version: "2.6.5-r0"
 
 ldap_container_image_reference: >-
   {{
@@ -22,8 +22,8 @@ ldap_container_image_repository: >-
     + ldap_container_image_namespace | default('')
     + ldap_container_image_name
   }}
-ldap_container_image_registry: "registry.gitlab.com"
-ldap_container_image_namespace: "famedly/infra/containers/"
+ldap_container_image_registry: "docker-oss.nexus.famedly.de"
+ldap_container_image_namespace: ""
 ldap_container_image_name: "openldap"
 
 ldap_container_name: "ldap"
