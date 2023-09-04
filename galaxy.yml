@@ -14,5 +14,5 @@ authors:
 description: "Common functionality needed on hosts to build complex services on."
 license: ["AGPL-3.0-only"]
 build_ignore: ["*.tar.gz"]
-repository: "https://gitlab.com/famedly/infra/collections/base"
-issues: "https://gitlab.com/famedly/infra/collections/base/-/issues"
+repository: "https://github.com/famedly/ansible-collection-base"
+issues: "https://github.com/famedly/ansible-collection-base/issues"

@@ -2,7 +2,7 @@
 
 ## Description
 
-Deploys [`famedly/containers/openldap`](https://gitlab.com/famedly/containers/openldap),
+Deploys [`famedly/containers/openldap`](https://github.com/famedly/container-image-openldap),
 which is openldap running in an alpine linux-based docker container.
 The `core.schema`, `cosine.schema` and `inetOrgPerson.schema` are loaded by default,
 and an MDB database is configured for the `ldap_domain`.
