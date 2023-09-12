@@ -2,7 +2,7 @@
 - hosts: ["localhost"]
   become: true
   roles:
-    - role: "famedly.base.redis"
+    - role: "redis"
   vars:
     redis_secret: "s3cr3t"
     redis_prefix: "test_"
