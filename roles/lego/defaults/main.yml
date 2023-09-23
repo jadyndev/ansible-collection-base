@@ -94,3 +94,4 @@ lego_dependencies:
       - "python3-cryptography"
     all:
       - "python3-cryptography"
+      - "acl"
