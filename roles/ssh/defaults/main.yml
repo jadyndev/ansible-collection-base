@@ -1,7 +1,7 @@
 ---
 ssh_config_file: "/etc/ssh/sshd_config"
 
-ssh_preset: "{{ ssh_bsi_recommended_presets }}"
+ssh_preset: "{{ ssh_secure_presets }}"
 ssh_loglevel: "VERBOSE"
 ssh_address_family: "any"
 
