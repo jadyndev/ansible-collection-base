@@ -81,51 +81,111 @@
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
-- name: "Only allow reasonably secure KeyExAlgorithms"
+- name: "Query supported KexAlgorithms"
+  ansible.builtin.command:
+    argv:
+      - ssh
+      - -Q
+      - KexAlgorithms
+  changed_when: false
+  check_mode: false
+  when: "ssh_preset.allowed_kexalgos is defined"
+  register: queried_kex_algorithms
+  tags: ["prepare", "prepare-sshd"]
+
+- name: "Only allow reasonably secure KexAlgorithms"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?KexAlgorithms"
-    line: "KexAlgorithms {{ ssh_preset.allowed_kexalgos | join(',') }}"
+    line: "KexAlgorithms {{ ssh_preset.allowed_kexalgos | intersect(queried_kex_algorithms.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
   when: "ssh_preset.allowed_kexalgos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
-- name: "Only allow reasonably secure ciphers"
+- name: "Query supported Ciphers"
+  ansible.builtin.command:
+    argv:
+      - ssh
+      - -Q
+      - Ciphers
+  changed_when: false
+  check_mode: false
+  when: "ssh_preset.allowed_cipers is defined"
+  register: queried_ciphers
+  tags: ["prepare", "prepare-sshd"]
+
+- name: "Only allow reasonably secure Ciphers"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?Ciphers"
-    line: "Ciphers {{ ssh_preset.allowed_ciphers | join(',') }}"
+    line: "Ciphers {{ ssh_preset.allowed_ciphers | intersect(queried_ciphers.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
   when: "ssh_preset.allowed_cipers is defined"
   notify: "reload sshd"
+  tags: ["prepare", "prepare-sshd"]
+
+- name: "Query supported MACs"
+  ansible.builtin.command:
+    argv:
+      - ssh
+      - -Q
+      - MACs
+  changed_when: false
+  check_mode: false
+  when: "ssh_preset.allowed_macs is defined"
+  register: queried_macs
   tags: ["prepare", "prepare-sshd"]
 
 - name: "Only allow reasonably secure MACs"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?MACs"
-    line: "MACs {{ ssh_preset.allowed_macs | join(',') }}"
+    line: "MACs {{ ssh_preset.allowed_macs | intersect(queried_macs.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
   when: "ssh_preset.allowed_macs is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
-- name: "Only allow reasonably secure hostkey algorithms"
+- name: "Query supported HostKeyAlgorithms"
+  ansible.builtin.command:
+    argv:
+      - ssh
+      - -Q
+      - HostKeyAlgorithms
+  changed_when: false
+  check_mode: false
+  when: "ssh_preset.allowed_hostkey_algos is defined"
+  register: queried_hostkey_algos
+  tags: ["prepare", "prepare-sshd"]
+
+- name: "Only allow reasonably secure HostKeyAlgorithms"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?HostKeyAlgorithms"
-    line: "HostKeyAlgorithms {{ ssh_preset.allowed_hostkey_algos | join(',') }}"
+    line: "HostKeyAlgorithms {{ ssh_preset.allowed_hostkey_algos | intersect(queried_hostkey_algos.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
   when: "ssh_preset.allowed_hostkey_algos is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
-- name: "Only allow reasonably secure publickey algorithms"
+- name: "Query supported PubkeyAcceptedKeyTypes"
+  ansible.builtin.command:
+    argv:
+      - ssh
+      - -Q
+      - PubkeyAcceptedKeyTypes
+  changed_when: false
+  check_mode: false
+  when: "ssh_preset.allowed_pubkey_algos is defined"
+  register: queried_pubkey_algos
+  tags: ["prepare", "prepare-sshd"]
+
+- name: "Only allow reasonably secure PubkeyAcceptedKeyTypes"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
     regexp: "^#?PubkeyAcceptedKeyTypes"
-    line: "PubkeyAcceptedKeyTypes {{ ssh_preset.allowed_pubkey_algos | join(',') }}"
+    line: "PubkeyAcceptedKeyTypes {{ ssh_preset.allowed_pubkey_algos | intersect(queried_pubkey_algos.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
   when: "ssh_preset.allowed_pubkey_algos is defined"
   notify: "reload sshd"
