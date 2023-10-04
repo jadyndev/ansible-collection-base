@@ -39,19 +39,19 @@ EXAMPLES = r"""
   debug:
     var: mypassword
   vars:
-    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example')}}"
+    mypassword: "{{ lookup('famedly.base.gpg_secretstore', 'example')}}"
 
 - name: lookup password and parse yaml
   debug:
     var: mypassword
   vars:
-    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/yaml', 'data_type=yaml')}}"
+    mypassword: "{{ lookup('famedly.base.gpg_secretstore', 'example/yaml', 'data_type=yaml')}}"
 
 - name: lookup password from non-default password-store location
   debug:
     var: mypassword
   vars:
-    mypassword: "{{ lookup('famedly.local.gpg_secretstore', 'example/temporary', 'password_store_path=/tmp/temporary-store')}}"
+    mypassword: "{{ lookup('famedly.base.gpg_secretstore', 'example/temporary', 'password_store_path=/tmp/temporary-store')}}"
 """
 
 RETURN = r"""
