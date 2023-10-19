@@ -1,0 +1,27 @@
+[Unit]
+Description={{ restic_job_description }}
+
+[Service]
+Type=oneshot
+User={{ restic_systemd_user }}
+WorkingDirectory={{ restic_systemd_working_directory }}
+SyslogIdentifier={{ restic_systemd_syslog_identifier }}
+
+{% for item in restic_systemd_environment | dict2items %}
+Environment={{ item.key }}={{ item.value }}
+{% endfor %}
+
+ExecStartPre=-/bin/sh -c '{{ restic_binary }} snapshots || {{ restic_binary }} init'
+{% for commands in restic_backup_commands %}
+ExecStart=/bin/sh -c '{{ commands.command }} | {{ restic_binary }} backup --verbose --stdin --stdin-filename {{ commands.filename }}'
+{% endfor %}
+
+{% if restic_backup_paths | length > 0 %}
+ExecStart={{ restic_binary }} --verbose backup {{ restic_backup_paths | join(' ') }}
+{% endif %}
+
+ExecStartPost=-{{ restic_binary }} snapshots
+ExecStartPost={{ restic_binary }} check
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,99 @@
+---
+- name: Ensure restic is present on system
+  when: restic_install_binary
+  block:
+    - name: Check if restic is available
+      ansible.builtin.stat:
+        path: "{{ restic_binary }}"
+      register: restic_binary_info
+      check_mode: false
+
+    - name: Check if restic is up to date
+      ansible.builtin.command: "{{ restic_binary }} version"
+      register: restic_version_info
+      when: restic_binary_info.stat.exists
+      check_mode: false
+      changed_when: false
+
+    - name: Ensure restic binary is present on host
+      when: "not restic_binary_info.stat.exists or ('restic ' ~ restic_version) not in restic_version_info.stdout"
+      block:
+        - name: Ensure restic release archive is downloaded
+          ansible.builtin.get_url:
+            url: "{{ restic_source_url }}"
+            dest: "{{ restic_source_archive_path }}"
+            url_username: "{{ restic_source_url_http_username | default(omit, true) }}"
+            url_password: "{{ restic_source_url_http_password | default(omit, true) }}"
+            mode: "0600"
+            owner: root
+            group: root
+          register: restic_download
+          until: restic_download is success
+          retries: 5
+          delay: 2
+
+        - name: Unzip latest restic version
+          ansible.builtin.command:
+            cmd: "bunzip2 -d {{ restic_source_archive_path }}"
+            creates: "{{ restic_source_path }}"
+
+        - name: Copy restic binary to /usr/local/bin
+          ansible.builtin.copy:
+            src: "{{ restic_source_path }}"
+            dest: "{{ restic_binary }}"
+            mode: "0755"
+            owner: root
+            group: root
+            remote_src: true
+      always:
+        - name: Ensure all source artifacts are cleaned up
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - "{{ restic_source_path }}"
+            - "{{ restic_source_archive_path }}"
+
+- name: Fail if no systemd available
+  ansible.builtin.fail:
+    msg: "This role requires systemd to be present for managing the backup service and timer"
+  when: ansible_facts['service_mgr'] != 'systemd'
+  check_mode: false
+
+- name: Ensure restic systemd service is templated
+  ansible.builtin.template:
+    src: restic.service.j2
+    dest: "{{ restic_systemd_unit_file_directory }}/{{ restic_systemd_service_name }}"
+    mode: "0640"
+    owner: "root"
+    group: "root"
+  notify:
+    - systemd_daemon_reload
+
+- name: Ensure restic systemd timer is templated
+  ansible.builtin.template:
+    src: restic.timer.j2
+    dest: "{{ restic_systemd_unit_file_directory }}/{{ restic_systemd_timer_name }}"
+    mode: "0640"
+    owner: "root"
+    group: "root"
+  notify:
+    - systemd_daemon_reload
+
+- name: Ensure handlers are flushed so systemd services are available
+  meta: flush_handlers
+
+- name: Ensure restic systemd service is enabled
+  ansible.builtin.systemd:
+    name: "{{ restic_systemd_service_name }}"
+    enabled: true
+
+- name: Ensure restic systemd timer is enabled
+  ansible.builtin.systemd:
+    name: "{{ restic_systemd_timer_name }}"
+    enabled: true
+
+- name: Ensure restic systemd timer is started
+  ansible.builtin.systemd:
+    name: "{{ restic_systemd_timer_name }}"
+    state: started

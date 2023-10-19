@@ -1,0 +1,11 @@
+[Unit]
+Description={{ restic_systemd_timer_description }}
+
+[Timer]
+OnCalendar={{ restic_systemd_timer_on_calendar }}
+AccuracySec={{ restic_systemd_timer_accuracy_sec }}
+Persistent={{ restic_systemd_timer_persistent | ternary('True', 'False') }}
+Unit={{ restic_systemd_service_name }}
+
+[Install]
+WantedBy=timers.target
