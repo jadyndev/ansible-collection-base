@@ -3,4 +3,4 @@
   hosts: "{{ restic_hosts | default('restic') }}"
   become: true
   roles:
-    - role: famedly.base.restic
+    - role: restic
