@@ -24,6 +24,14 @@ To control what and how data is backed up, see:
 - `restic_backup_commands`: takes an array of dictionaries of
   the form `{command, filename}`, where the output of `command`
   is fed into `restic backup --stdin --stdin-filename {{ filename }}`.
+- `restic_backup_parameters`: takes a dictionary of key-value pairs
+  which are added as commandline parameters to the `restic backup` call
+  for `restic_backup_paths`, for example:
+  ```yaml
+  restic_backup_parameters:
+    exclude: /home/user/.cache/
+    verbose:
+  ```
 
 To control when backups are run, see `restic_systemd_timer_on_calendar`
 and `restic_systemd_timer_accuray_sec`.

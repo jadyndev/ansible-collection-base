@@ -17,7 +17,21 @@ ExecStart=/bin/sh -c '{{ commands.command }} | {{ restic_binary }} backup --verb
 {% endfor %}
 
 {% if restic_backup_paths | length > 0 %}
-ExecStart={{ restic_binary }} --verbose backup {{ restic_backup_paths | join(' ') }}
+ExecStart={{ restic_binary }} backup {{ restic_backup_paths | join(' ') }}{% if restic_backup_parameters | length > 0 %} \
+    {% for param in restic_backup_parameters | dict2items %}
+      {%- set outer_loop = loop %}
+      {%- if param.value is not string and param.value is not mapping and param.value is iterable -%}
+        {%- for item in param.value -%}
+    --{{ param.key }}={{ item }}{% if not loop.last %} \
+    {% endif -%}
+        {%- endfor -%}
+      {%- else -%}
+    --{{ param.key }}{% if param.value %}={{ param.value }}{% endif %}
+      {%- endif %}
+      {%- if not outer_loop.last %} \{% endif %}
+
+    {% endfor -%}
+{% endif %}
 {% endif %}
 
 ExecStartPost=-{{ restic_binary }} snapshots
