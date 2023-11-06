@@ -29,7 +29,7 @@ rclone_serve_container_command: >-
       {%- if not rclone_flag.value -%}
         {%- do rclone_flags.append('--' ~ rclone_flag.key) -%}
       {%- elif rclone_flag.value -%}
-        {%- do rclone_flags.append('--' ~ rclone_flag.key ~ ' ' ~ rclone_flag.value) -%}
+        {%- do rclone_flags.append('--' ~ rclone_flag.key ~ '=' ~ rclone_flag.value) -%}
       {%- endif -%}
     {%- endfor -%}
   serve
