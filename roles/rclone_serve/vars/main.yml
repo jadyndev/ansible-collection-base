@@ -36,3 +36,4 @@ rclone_serve_container_command: >-
   {{ rclone_serve_protocol }}
   {{ rclone_serve_backend_remote }}:{{ rclone_serve_backend_path }}
   {{ rclone_flags | join(' ') }}
+  {{ rclone_serve_args | join(' ') }}

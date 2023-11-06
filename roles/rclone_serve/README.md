@@ -25,11 +25,14 @@ rclone_serve_flags:
   append-only:
 ```
 
-For more variables see default/main.yml file.
+When single-dash flags need to be passed to rclone (such as `-v`), use `rclone_serve_args` to list those
+options in an array.
+
+For more variables see [`defaults/main.yml`](defaults/main.yml) file.
 
 ## Dependencies
-- sivel.toiletwater collection for ini templating
-- Docker
+- `sivel.toiletwater` ansible collection for ini templating
+- Docker and python docker bindings (usually `python3-docker` or `pip3 install docker`) on the target host
 
 ## Example Playbook
 ```yaml

@@ -9,6 +9,7 @@ rclone_serve_base_path: "/opt/rclone-serve/"
 rclone_serve_protocol: ~
 rclone_serve_backend_config: ~
 rclone_serve_flags: ~
+rclone_serve_args: []
 
 rclone_serve_backend_remote: "default"
 rclone_serve_backend_path: ""
