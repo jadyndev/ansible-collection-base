@@ -1,7 +1,7 @@
 ---
 
-rclone_serve_backends:
-  default: "{{ rclone_serve_backend_config }}"
+rclone_serve_backends: >-
+  {{ { rclone_serve_backend_remote : rclone_serve_backend_config } }}
 
 rclone_serve_flags_base:
   addr: ":8080"
@@ -34,5 +34,5 @@ rclone_serve_container_command: >-
     {%- endfor -%}
   serve
   {{ rclone_serve_protocol }}
-  default:
+  {{ rclone_serve_backend_remote }}:{{ rclone_serve_backend_path }}
   {{ rclone_flags | join(' ') }}

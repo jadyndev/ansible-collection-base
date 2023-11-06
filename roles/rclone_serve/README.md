@@ -39,6 +39,7 @@ For more variables see default/main.yml file.
     - role: rclone_serve
   vars:
     rclone_serve_protocol: "restic"
+    rclone_serve_backend_path: "my_scw_bucket_name"
     rclone_serve_backend_config:
       type: "s3"
       provider: "Scaleway"
