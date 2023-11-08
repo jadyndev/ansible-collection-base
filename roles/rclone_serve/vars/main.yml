@@ -1,7 +1,7 @@
 ---
 
 rclone_serve_backends: >-
-  {{ { rclone_serve_backend_remote : rclone_serve_backend_config } }}
+  {{ {rclone_serve_backend_remote: rclone_serve_backend_config} }}
 
 rclone_serve_flags_base:
   addr: ":8080"
