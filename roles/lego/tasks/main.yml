@@ -186,7 +186,7 @@
     dest: "{{ lego_systemd_path }}/lego.service"
     owner: "root"
     group: "root"
-    mode: "0755"
+    mode: "0640"
   notify: ["Reload systemd"]
   tags: ["deploy", "deploy-lego"]
 
@@ -196,7 +196,7 @@
     dest: "{{ lego_systemd_path }}/lego.timer"
     owner: "root"
     group: "root"
-    mode: "0755"
+    mode: "0640"
   notify: ["Reload systemd"]
   tags: ["deploy", "deploy-lego"]
 
