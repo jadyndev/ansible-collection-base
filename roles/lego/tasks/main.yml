@@ -27,13 +27,24 @@
   tags: ["prepare", "prepare-lego"]
 
 - name: "Ensure certificate directory exists and has the configured permissions"
-  file:
+  ansible.builtin.file:
     path: "{{ lego_certificate_store }}"
     state: "directory"
     owner: "{{ lego_certificate_store_user }}"
     group: "{{ lego_certificate_store_group }}"
     mode: "{{ lego_certificate_store_mode }}"
   tags: ["prepare", "prepare-lego"]
+  register: lego_certificate_store_info
+
+- name: "Ensure certificates in directory belong to '{{ lego_certificate_store_user }}:{{ lego_certificate_store_group }}'"
+  ansible.builtin.file:
+    path: "{{ lego_certificate_store }}"
+    state: directory
+    owner: "{{ lego_certificate_store_user }}"
+    group: "{{ lego_certificate_store_group }}"
+    recurse: true
+  tags: ["prepare", "prepare-lego"]
+  when: lego_certificate_store_info.changed
 
 - name: "Ensure lego binary exists and has the correct version"
   shell: "{{ lego_check_version_cmd }}"  # noqa: command-instead-of-shell
