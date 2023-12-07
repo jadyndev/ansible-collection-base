@@ -48,10 +48,6 @@ options:
             key(s) for decryption
         type: str
         default: pubring.kbx
-    gnupg_home:
-        description: Folder containing the Keyring and other gnupg config files
-        type: str
-        default: ~/.gnupg
     pass_gpg_id_file:
         description: Filename of the file containing the recipient pub key IDs
         type: str
@@ -316,7 +312,6 @@ def main():
             keyring=dict(
                 required=False, type="str", default="pubring.kbx", no_log=False
             ),
-            gnupg_home=dict(required=False, type="str", default="~/.gnupg"),
             pass_gpg_id_file=dict(
                 required=False, type="str", default=".gpg-id", no_log=False
             ),
@@ -367,7 +362,6 @@ def main():
         password_store_path=module.params["password_store_path"],
         file_extension=module.params["file_extension"],
         keyring=module.params["keyring"],
-        gnupg_home=module.params["gnupg_home"],
         pass_gpg_id_file=module.params["pass_gpg_id_file"],
     )
 
