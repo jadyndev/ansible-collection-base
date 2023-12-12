@@ -184,7 +184,6 @@ warning:
 """
 
 import hashlib
-import traceback
 from pathlib import Path
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -209,7 +208,7 @@ else:
     GIT_IMPORT_ERROR = None
 
 try:
-    import gnupg
+    import gnupg  # pylint: disable=unused-import
 except ImportError as imp_exc:
     GNUPG_IMPORT_ERROR = imp_exc
 else:

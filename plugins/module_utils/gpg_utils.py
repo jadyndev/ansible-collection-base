@@ -13,7 +13,6 @@ __metaclass__ = type
 import os.path
 from pathlib import Path
 from typing import Union
-import traceback
 
 
 try:
