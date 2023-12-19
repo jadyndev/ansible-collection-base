@@ -111,7 +111,7 @@
       - Ciphers
   changed_when: false
   check_mode: false
-  when: "ssh_preset.allowed_cipers is defined"
+  when: "ssh_preset.allowed_ciphers is defined"
   register: queried_ciphers
   tags: ["prepare", "prepare-sshd"]
 
@@ -121,7 +121,7 @@
     regexp: "^#?Ciphers"
     line: "Ciphers {{ ssh_preset.allowed_ciphers | intersect(queried_ciphers.stdout_lines) | join(',') }}"
     insertafter: *cipher_after
-  when: "ssh_preset.allowed_cipers is defined"
+  when: "ssh_preset.allowed_ciphers is defined"
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
