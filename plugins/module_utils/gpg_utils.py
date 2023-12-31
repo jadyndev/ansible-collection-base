@@ -232,6 +232,7 @@ class SecretStore:
         while base_path.as_posix() != "/":
             if os.path.isfile(base_path / self.pass_gpg_id_file):
                 break
+            print(f"debug: no {self.pass_gpg_id_file} file found on {base_path}, traversing up")
             base_path = base_path.parent
         else:
             raise FileNotFoundError(
