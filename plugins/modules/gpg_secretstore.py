@@ -190,6 +190,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.famedly.base.plugins.module_utils.gpg_utils import (
     SecretStore,
     RecipientsMismatchError,
+    GPGException,
     check_secretstore_import_errors,
 )
 
@@ -437,6 +438,10 @@ def main():
                 result["diff"]["after"] = store.get_recipients(slug=password_slug)
                 result["action"] = "update"
                 result["changed"] = True
+
+            except GPGException as e:
+                result["msg"] = "GPG Exception: " + str(e)
+                failed = True
 
             if module.params["secret_fact"]:
                 result["ansible_facts"][module.params["secret_fact"]] = result["secret"]

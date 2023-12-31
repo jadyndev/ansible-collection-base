@@ -162,9 +162,13 @@ class SecretStore:
             with open(file, "rb") as f:
                 recipient_subkeys = self.__gpg.get_recipients(f.read())
             for recipient_subkey in recipient_subkeys:
-                recipients.append(
-                    self.__gpg.list_keys(keys=recipient_subkey).fingerprints[0]
-                )
+                found_keys = self.__gpg.list_keys(keys=recipient_subkey)
+                if found_keys and found_keys.fingerprints and len(found_keys.fingerprints) > 0:
+                    recipients.append(
+                        found_keys.fingerprints[0]
+                    )
+                else:
+                    raise GPGException(f"Can not find primary key in keyring for encryption subkey {recipient_subkey}")
             return recipients
         except FileNotFoundError:
             raise FileNotFoundError
