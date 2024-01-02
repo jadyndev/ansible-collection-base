@@ -179,10 +179,11 @@ message:
     returned: changed
 warning:
     description: Human-readable warnings that accrued during the task
-    type: str
+    type: str[]
     returned: failed or successful but with warnings
 """
 
+import os
 import hashlib
 from pathlib import Path
 
@@ -351,12 +352,18 @@ def main():
 
     errors = []
     traceback = []
+    warnings = []
+
+    # Warn if running as root
+    if os.geteuid() == 0:
+        warnings.append("Running as root, ensure GPG keyring is present for root user")
+
     error_map = check_secretstore_import_errors() | check_module_import_errors()
     for lib, exception in error_map.items():
         errors.append(missing_required_lib(lib))
         traceback.append(exception)
     if errors:
-        module.fail_json(errors=errors, traceback="\n".join(traceback))
+        module.fail_json(warning=',\n'.join(warnings), errors=errors, traceback="\n".join(traceback))
 
     store = SecretStore(
         password_store_path=module.params["password_store_path"],
@@ -382,7 +389,7 @@ def main():
     result = dict(
         changed=False,
         message="",
-        warning="",
+        warning=warnings,
         password_slug=module.params["password_slug"],
         secret="",
         ansible_facts={},
@@ -428,7 +435,7 @@ def main():
                 result["changed"] = True
 
             except RecipientsMismatchError:
-                result["warning"] = "Secret-Recipient-Mismatch! Re-encrypting."
+                result["warning"].append("Secret-Recipient-Mismatch! Re-encrypting.")
                 result["secret"] = store.get(
                     slug=password_slug, data_type=data_type, check_recipients=False
                 )
@@ -486,7 +493,8 @@ def main():
         module.log(result["message"])
 
     if result["warning"]:
-        module.warn(result["warning"])
+        for warn_msg in result["warning"]:
+          module.warn(warn_msg)
 
     result["diff"]["before"] = "\n".join(result["diff"]["before"]) + "\n"
     result["diff"]["after"] = "\n".join(result["diff"]["after"]) + "\n"
