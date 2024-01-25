@@ -360,10 +360,11 @@ def main():
 
     error_map = check_secretstore_import_errors() | check_module_import_errors()
     for lib, exception in error_map.items():
+        warnings.append(f"Missing python library: {lib}")
         errors.append(missing_required_lib(lib))
-        traceback.append(exception)
+        traceback.append(str(exception))
     if errors:
-        module.fail_json(warning=',\n'.join(warnings), errors=errors, traceback="\n".join(traceback))
+        module.fail_json(warning=',\n'.join(warnings), errors=errors, traceback="\n".join(traceback), msg=',\n'.join(warnings))
 
     store = SecretStore(
         password_store_path=module.params["password_store_path"],
