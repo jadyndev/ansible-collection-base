@@ -86,6 +86,7 @@
         group: "{{ lego_user_res.group }}"
         remote_src: true
       tags: ["prepare", "prepare-lego"]
+      when: not ansible_check_mode
 
     - name: "Allow lego to bind to ports below 1024"
       community.general.capabilities:
