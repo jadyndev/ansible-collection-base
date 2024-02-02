@@ -25,3 +25,4 @@
     exclusive: true
   become: true
   when: "user.attrs.active | default(false)"
+  ignore_errors: "{{ ansible_check_mode }}"
