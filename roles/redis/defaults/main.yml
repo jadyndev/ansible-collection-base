@@ -1,5 +1,5 @@
 ---
-redis_version: "6.2.6"
+redis_version: "7.2.4"
 redis_user: "{{ redis_prefix }}redis"
 redis_basepath: "/opt/redis"
 redis_data_dir: "{{ redis_basepath }}/{{ redis_prefix }}data"
