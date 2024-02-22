@@ -3,7 +3,7 @@ Description={{ restic_systemd_timer_description }}
 
 [Timer]
 OnCalendar={{ restic_systemd_timer_on_calendar }}
-AccuracySec={{ restic_systemd_timer_accuracy_sec }}
+RandomizedDelaySec={{ restic_systemd_timer_randomized_delay_sec }}
 Persistent={{ restic_systemd_timer_persistent | ternary('True', 'False') }}
 Unit={{ restic_systemd_service_name }}
 

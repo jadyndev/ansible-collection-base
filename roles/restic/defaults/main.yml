@@ -20,7 +20,7 @@ restic_systemd_working_directory: "/tmp"
 restic_systemd_syslog_identifier: "{{ restic_systemd_unit_name }}"
 
 restic_systemd_timer_on_calendar: daily
-restic_systemd_timer_accuracy_sec: 3600
+restic_systemd_timer_randomized_delay_sec: 3600
 restic_systemd_timer_persistent: true
 restic_systemd_timer_description: >-
   Run {{ restic_systemd_unit_name }}.service on schedule
