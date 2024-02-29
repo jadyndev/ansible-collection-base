@@ -66,6 +66,24 @@
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
+- name: "Set maximum number of concurrent unauthenticated connections"
+  ansible.builtin.lineinfile:
+    <<: *sshd_config_args
+    regexp: "^#?MaxStartups"
+    line: "MaxStartups {{ sshd_config_max_startups }}"
+  when: "sshd_config_max_startups is defined"
+  notify: "reload sshd"
+  tags: ["prepare", "prepare-sshd"]
+
+- name: "Unset maximum number of concurrent unauthenticated connections"
+  ansible.builtin.lineinfile:
+    <<: *sshd_config_args
+    regexp: "^#?MaxStartups"
+    line: "#MaxStartups 10:30:100"
+  when: "sshd_config_max_startups is not defined"
+  notify: "reload sshd"
+  tags: ["prepare", "prepare-sshd"]
+
 - name: "Only allow SSHv2"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
