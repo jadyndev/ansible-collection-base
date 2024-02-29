@@ -48,6 +48,24 @@
   notify: "reload sshd"
   tags: ["prepare", "prepare-sshd"]
 
+- name: "Set maximum number of open sessions permitted per network connection"
+  ansible.builtin.lineinfile:
+    <<: *sshd_config_args
+    regexp: "^#?MaxSessions"
+    line: "MaxSessions {{ sshd_config_max_sessions }}"
+  when: "sshd_config_max_sessions is defined"
+  notify: "reload sshd"
+  tags: ["prepare", "prepare-sshd"]
+
+- name: "Unset maximum number of open sessions permitted per network connection"
+  ansible.builtin.lineinfile:
+    <<: *sshd_config_args
+    regexp: "^#?MaxSessions"
+    line: "#MaxSessions 10"
+  when: "sshd_config_max_sessions is not defined"
+  notify: "reload sshd"
+  tags: ["prepare", "prepare-sshd"]
+
 - name: "Only allow SSHv2"
   ansible.builtin.lineinfile:
     <<: *sshd_config_args
