@@ -179,7 +179,7 @@ message:
     returned: changed
 warning:
     description: Human-readable warnings that accrued during the task
-    type: str[]
+    type: list
     returned: failed or successful but with warnings
 """
 
@@ -364,7 +364,12 @@ def main():
         errors.append(missing_required_lib(lib))
         traceback.append(str(exception))
     if errors:
-        module.fail_json(warning=',\n'.join(warnings), errors=errors, traceback="\n".join(traceback), msg=',\n'.join(warnings))
+        module.fail_json(
+            warning=",\n".join(warnings),
+            errors=errors,
+            traceback="\n".join(traceback),
+            msg=",\n".join(warnings),
+        )
 
     store = SecretStore(
         password_store_path=module.params["password_store_path"],
@@ -419,9 +424,9 @@ def main():
                     )
                     result["changed"] = False
                 else:
-                    result[
-                        "message"
-                    ] = "Secret rotation requested: rotating, if possible."
+                    result["message"] = (
+                        "Secret rotation requested: rotating, if possible."
+                    )
                     result["secret"] = secretGenerator.getSecretData()
                     result["action"] = "update"
                     result["changed"] = True
@@ -495,7 +500,7 @@ def main():
 
     if result["warning"]:
         for warn_msg in result["warning"]:
-          module.warn(warn_msg)
+            module.warn(warn_msg)
 
     result["diff"]["before"] = "\n".join(result["diff"]["before"]) + "\n"
     result["diff"]["after"] = "\n".join(result["diff"]["after"]) + "\n"

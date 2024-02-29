@@ -163,12 +163,16 @@ class SecretStore:
                 recipient_subkeys = self.__gpg.get_recipients(f.read())
             for recipient_subkey in recipient_subkeys:
                 found_keys = self.__gpg.list_keys(keys=recipient_subkey)
-                if found_keys and found_keys.fingerprints and len(found_keys.fingerprints) > 0:
-                    recipients.append(
-                        found_keys.fingerprints[0]
-                    )
+                if (
+                    found_keys
+                    and found_keys.fingerprints
+                    and len(found_keys.fingerprints) > 0
+                ):
+                    recipients.append(found_keys.fingerprints[0])
                 else:
-                    raise GPGException(f"Can not find primary key in keyring for encryption subkey {recipient_subkey}")
+                    raise GPGException(
+                        f"Can not find primary key in keyring for encryption subkey {recipient_subkey}"
+                    )
             return recipients
         except FileNotFoundError:
             raise FileNotFoundError
@@ -232,7 +236,9 @@ class SecretStore:
         while base_path.as_posix() != "/":
             if os.path.isfile(base_path / self.pass_gpg_id_file):
                 break
-            print(f"debug: no {self.pass_gpg_id_file} file found on {base_path}, traversing up")
+            # This is not the proper way to do it, but the proper way is extremely complicated
+            # because we are in module_utils and not a module
+            # print(f"debug: no {self.pass_gpg_id_file} file found on {base_path}, traversing up")
             base_path = base_path.parent
         else:
             raise FileNotFoundError(
