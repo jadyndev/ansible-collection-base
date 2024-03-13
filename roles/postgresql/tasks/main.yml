@@ -144,7 +144,7 @@
     memory: "{{ postgresql_container_memory }}"
     memory_swap: "{{ postgresql_container_memory_swap | default(omit) }}"
     shm_size: "{{ postgresql_container_shm_size }}"
-    oom_killer: "{{ postgresql_container_oom_killer | default(omit) }}"
+    oom_score_adj: "{{ postgresql_container_oom_score_adj | default(omit) }}"
     recreate: "{{ postgresql_container_recreate }}"
     user: "{{ postgresql_user_res.uid }}:{{ postgresql_user_res.group }}"
     restart_policy: "unless-stopped"
